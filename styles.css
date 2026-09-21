@@ -261,11 +261,14 @@ body.live-now .nav, body.live-soon .nav { top: var(--live-banner-h, 64px); }
 
 .live-banner {
   position: sticky; top: 0; z-index: 200;
-  display: flex; align-items: center; gap: 0.9rem;
-  padding: 0.65rem 1.1rem;
   background: linear-gradient(115deg, #200d13 0%, #12172c 55%, #0a0e1c 100%);
   border-bottom: 2px solid #e5484d;
   box-shadow: 0 8px 28px rgba(229, 72, 77, 0.28);
+}
+.live-banner-inner {
+  max-width: 1100px; margin: 0 auto; width: 100%;
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.65rem 1.2rem;
 }
 body.live-soon .live-banner {
   border-bottom-color: var(--gold);
@@ -302,7 +305,7 @@ body.live-soon .live-dot {
 @media (max-width: 560px) {
   #live-banner-sub { display: none; }
   .live-btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
-  .live-banner { gap: 0.65rem; padding: 0.55rem 0.8rem; }
+  .live-banner-inner { gap: 0.65rem; padding: 0.55rem 0.8rem; }
 }
 
 .live-hero {
