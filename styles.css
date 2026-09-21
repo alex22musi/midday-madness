@@ -243,6 +243,23 @@ img.host-photo {
 .listen { text-align: center; }
 .listen .big { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 800; color: var(--gold-soft); }
 .listen p:last-of-type { color: var(--muted); margin-top: 0.4rem; }
+.listen-live {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  margin-top: 1.2rem; padding: 0.85rem 1.8rem;
+  background: var(--gold); color: #1a1206;
+  font-weight: 800; font-size: 1.05rem; text-decoration: none;
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(227, 168, 60, 0.4);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.listen-live:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(227, 168, 60, 0.5); }
+.listen-note { color: var(--muted); font-size: 0.9rem; margin-top: 0.9rem; }
+.listen-alt { color: var(--muted); font-size: 0.95rem; margin-top: 0.7rem; }
+.listen-alt a {
+  color: var(--gold-soft); font-weight: 700; text-decoration: none;
+  border-bottom: 1px solid rgba(227, 168, 60, 0.5);
+}
+.listen-alt a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
 /* ---------- footer ---------- */
 footer {
