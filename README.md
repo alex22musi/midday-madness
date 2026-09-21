@@ -41,13 +41,42 @@ GitHub Pages serves the **`main` branch root**. Push/commit to `main` → live i
 
 - **New clips**: replace `assets/clipN.mp4` and `assets/posterN.jpg`, then update the
   card's `<h3>` title, `.meta` duration, and description in `index.html`.
-- **New full episode**: replace `assets/full-show.m4a` and update the `.episode-title` date.
+- **New full episode**: replace `assets/full-show.m4a` and update the `.player-title`
+  date in `index.html` (the player reads duration automatically).
 - **Logo**: replace `assets/logo.jpg`. It is also the favicon, Apple touch icon,
   and the `og:image` / Twitter card image, so sharing previews update automatically.
+  Keep the logo centered in its canvas — an off-center logo looks broken on the
+  spinning record in clips and in the player artwork.
 - **Bios**: host cards live in the `#about` section of `index.html`.
+
+## Custom audio player
+
+The Full Episode section uses a bespoke player (no native `<audio>` controls),
+styled after Apple Podcasts / Spotify:
+
+- **Header row**: show logo artwork + "Latest episode" kicker + episode title/date.
+- **Scrubber**: current time / total time with a draggable progress bar and
+  buffered indicator (knob appears on hover/focus).
+- **Transport**: circular −15s / +30s skip buttons (Apple-style curved-arrow icons
+  with the seconds inside) flanking a large gold play/pause button.
+- **Tools row**: segmented speed control (1×, 1.25×, 1.5×, 2×) and a volume slider
+  (desktop only; hidden on small screens).
+- Keyboard: `←`/`→` on the scrubber skip ∓15s.
+
+All player logic lives in the `<script>` at the bottom of `index.html`;
+all styling under `/* ---------- full episode ---------- */` in `styles.css`.
 
 ## Brand
 
 - Navy `#0a0e1c` / `#10162a`, gold `#e3a83c`, soft gold `#f2c66d`
 - Logo wording: orange "MIDDAY", blue "MADNESS"
 - Clip rendering spec: see `docs/CLIP_WORKFLOW.md`
+
+## Troubleshooting
+
+- **Page shows old content**: hard refresh (Cmd/Ctrl+Shift+R) — GitHub Pages can
+  take ~1 minute and browsers cache aggressively.
+- **Clip won't play on the site**: confirm the MP4 is H.264 + AAC
+  (`ffprobe assets/clip1.mp4`) and under GitHub's 100 MB file limit.
+- **Share preview shows the old logo**: scrapers cache `og:image` — use each
+  platform's debugger (e.g. Facebook Sharing Debugger) to re-scrape.
