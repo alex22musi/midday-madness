@@ -1,0 +1,122 @@
+:root {
+  --navy: #0a0e1c;
+  --navy-2: #10162a;
+  --gold: #e3a83c;
+  --gold-soft: #f2c66d;
+  --text: #f4f1e8;
+  --muted: #a9aec2;
+  --card: #141b31;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/* ---------- nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10, 14, 28, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(227, 168, 60, 0.25);
+}
+.nav-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0.7rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+.brand img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+.brand span { color: var(--gold); font-weight: 800; letter-spacing: 0.12em; font-size: 0.95rem; }
+.nav nav { display: flex; gap: 1.2rem; }
+.nav nav a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+.nav nav a:hover { color: var(--gold); }
+
+/* ---------- hero ---------- */
+.hero {
+  text-align: center;
+  padding: 4.5rem 1.2rem 3.5rem;
+  background: radial-gradient(ellipse 70% 55% at 50% 38%, rgba(227, 168, 60, 0.14), transparent 70%);
+}
+.hero-logo {
+  width: 190px; height: 190px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 60px rgba(227, 168, 60, 0.35);
+  margin-bottom: 1.4rem;
+}
+.hero h1 {
+  color: var(--gold); font-size: clamp(2.2rem, 7vw, 3.6rem);
+  letter-spacing: 0.08em; font-weight: 900; line-height: 1.1;
+}
+.tagline { font-size: 1.25rem; margin-top: 0.6rem; color: var(--text); font-weight: 500; }
+.schedule { color: var(--muted); margin-top: 0.4rem; letter-spacing: 0.04em; }
+.cta {
+  display: inline-block; margin-top: 1.6rem;
+  background: var(--gold); color: #1a1206;
+  font-weight: 800; letter-spacing: 0.03em;
+  padding: 0.85rem 2.2rem; border-radius: 999px; text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(227, 168, 60, 0.4); }
+
+/* ---------- sections ---------- */
+section { max-width: 1100px; margin: 0 auto; padding: 3.5rem 1.2rem; }
+section h2 {
+  color: var(--gold); letter-spacing: 0.18em; font-size: 1.05rem;
+  font-weight: 800; text-align: center; margin-bottom: 2rem;
+}
+
+/* ---------- clips ---------- */
+.clip-grid {
+  display: grid; gap: 1.6rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 760px) { .clip-grid { grid-template-columns: repeat(3, 1fr); } }
+.clip-card {
+  background: var(--card); border-radius: 18px; overflow: hidden;
+  border: 1px solid rgba(227, 168, 60, 0.18);
+}
+.clip-card video {
+  width: 100%; aspect-ratio: 9 / 16; display: block; background: #000;
+  max-height: 480px; object-fit: contain;
+}
+.clip-body { padding: 1.1rem 1.2rem 1.4rem; }
+.clip-body h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
+.clip-body .meta { color: var(--gold); font-weight: 700; font-size: 0.85rem; margin-bottom: 0.5rem; }
+.clip-body p:last-child { color: var(--muted); font-size: 0.95rem; }
+
+/* ---------- about ---------- */
+.about { background: var(--navy-2); max-width: none; }
+.about > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
+.about-lede { text-align: center; max-width: 640px; margin: 0 auto 2.5rem; color: var(--text); font-size: 1.1rem; }
+.hosts { display: grid; gap: 1.6rem; grid-template-columns: 1fr; max-width: 720px; }
+@media (min-width: 640px) { .hosts { grid-template-columns: 1fr 1fr; } }
+.host {
+  background: var(--card); border-radius: 18px; padding: 1.8rem 1.4rem; text-align: center;
+  border: 1px solid rgba(227, 168, 60, 0.18);
+}
+.host-photo {
+  width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 1rem;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px dashed rgba(227, 168, 60, 0.5); color: var(--muted); font-size: 0.75rem;
+  text-align: center; padding: 0.5rem;
+}
+.host h3 { font-size: 1.15rem; }
+.host .role { color: var(--gold); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; margin: 0.2rem 0 0.6rem; }
+.host .bio { color: var(--muted); font-size: 0.95rem; }
+
+/* ---------- listen ---------- */
+.listen { text-align: center; }
+.listen .big { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 800; color: var(--gold-soft); }
+.listen p:last-of-type { color: var(--muted); margin-top: 0.4rem; }
+
+/* ---------- footer ---------- */
+footer {
+  border-top: 1px solid rgba(227, 168, 60, 0.25);
+  text-align: center; padding: 1.6rem 1rem; color: var(--muted); font-size: 0.9rem;
+}
