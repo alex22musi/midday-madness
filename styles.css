@@ -110,6 +110,15 @@ section h2 {
 .host .role { color: var(--gold); font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; margin: 0.2rem 0 0.6rem; }
 .host .bio { color: var(--muted); font-size: 0.95rem; }
 
+img.host-photo {
+  border: 2px solid var(--gold); object-fit: cover; display: block; padding: 0;
+}
+
+/* ---------- full episode ---------- */
+.episode { text-align: center; }
+.episode-title { color: var(--text); font-weight: 600; margin-bottom: 1.2rem; }
+.episode audio { width: 100%; max-width: 640px; }
+
 /* ---------- listen ---------- */
 .listen { text-align: center; }
 .listen .big { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 800; color: var(--gold-soft); }
