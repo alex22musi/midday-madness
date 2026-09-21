@@ -7,6 +7,8 @@ Owner: Alex. Last updated: 2026-09-21.
 
 - Log timestamps in the Clip Log doc while the show is fresh (3–4 candidates).
 - Aim for 30–60 second clips with one clear take.
+- Give each clip a punchy title (e.g. "Another Ryan Day Choke Job") — the title
+  appears on the thumbnail, in the clip itself, and on the website card.
 
 ## 1. Thumbnails FIRST (Canva)
 
@@ -14,6 +16,8 @@ Thumbnails are designed **before** the clip is cut, so the clip's look is locked
 
 - Canvas: **1080 × 1920** (9:16 vertical).
 - Brand: navy `#0a0e1c` background, gold `#e3a83c` accents, podcast logo.
+  Source of truth for the logo is the **"M" design in Canva** (page 4, primary badge,
+  transparent PNG export) — always re-export from there, never from a screenshot.
 - Include the clip title big and readable at phone size.
 - Make **2–3 variations per clip**; at least one variation includes the host names
   ("Alex Musicus & Sam Singer").
@@ -31,8 +35,9 @@ Thumbnails are designed **before** the clip is cut, so the clip's look is locked
 
 - Transcribe the segment and produce per-word `start`/`end` timings
   (e.g. `clipN_words.json`: `[{"w": "Ryan", "start": 1.2, "end": 1.5}, …]`).
-- **Re-verify every player/coach name** before rendering: Ryan Day, Caleb Williams,
-  Ben Johnson, Patrick Mahomes, John Mateer, … (add new names as they appear).
+- **Re-verify every player/coach name** before rendering (past corrections:
+  Ryan Day, Caleb Williams, Ben Johnson, Patrick Mahomes, John Mateer).
+  Add new names to this list as they appear.
 
 ## 4. Configure the render
 
@@ -42,6 +47,9 @@ Edit `clips.json`:
 {"file": "clip1.mp4", "title": "Another Ryan Day Choke Job", "start": "10:04", "end": "11:00"}
 ```
 
+The renderer (`~/workspace/podcast/render_clips_v3.py`) reads `clips.json` plus
+`clipN_words.json` and writes `~/workspace/your_files/podcast-clips/clipN.mp4`.
+
 ## 5. Render
 
 ```bash
@@ -49,16 +57,16 @@ cd ~/workspace/podcast
 python3 render_clips_v3.py
 ```
 
-Output: `~/workspace/your_files/podcast-clips/clipN.mp4`
-
 ### Render spec (do not change without updating this doc)
 
 - Canvas **1080 × 1920**, 30 fps, H.264 + AAC.
 - Background: navy gradient + soft gold radial glow.
-- Spinning record: podcast logo as a vinyl record, **one full rotation per 10 s**,
-  record hole centered between the football and the helmet in the logo art.
+- Spinning record: podcast logo as a vinyl record, **one full rotation per 10 s**.
+  The logo source is `show-logo-centered.png` (transparent Canva export); the
+  renderer crops to the logo's opaque bounding box automatically, so the record
+  stays centered even if the art changes. Record hole/spindle drawn at center.
 - Persistent header: `MIDDAY MADNESS` (gold) at top.
-- Clip title: top of frame in a dark pill with gold outline (never over the logo).
+- Clip title: top of frame in a dark pill with gold outline (**never over the logo**).
 - Byline under the title: `by Alex Musicus & Sam Singer`.
 - Karaoke captions: two lines max, active word highlighted gold, names verified.
 - Waveform: gold bars, bottom third. Footer: `Every Wednesday at 1 PM • WIUX 99.1`.
@@ -66,7 +74,8 @@ Output: `~/workspace/your_files/podcast-clips/clipN.mp4`
 ## 6. Verify
 
 - `ffprobe`: 1080×1920, H.264/AAC, duration matches `clips.json`.
-- Spot-check frames: title pill at top, record spinning, captions timed, names spelled right.
+- Spot-check frames: title pill at top (clear of the header), record spinning and
+  centered, captions timed, names spelled right.
 - Watch once through at 1× before shipping.
 
 ## 7. Ship
@@ -74,10 +83,12 @@ Output: `~/workspace/your_files/podcast-clips/clipN.mp4`
 - **Website**: replace `assets/clipN.mp4` + `assets/posterN.jpg` (one file per commit
   via GitHub web UI for files >10 MB), update titles/durations in `index.html`,
   confirm the live page plays them.
-- **Socials**: post the MP4 + thumbnail per the Instagram plan.
+- **Socials**: post the MP4 + thumbnail per the Instagram plan
+  (`~/workspace/your_files/midday-madness-instagram-plan.md`).
 - **Drive**: upload approved finals to the episode folder.
 
 ## 8. Roll to next week
 
 - Archive this week's `clipN_words.json` / config, reset `clips.json` for the new show.
-- New full episode: replace `assets/full-show.m4a`, update the date in `index.html`.
+- New full episode: replace `assets/full-show.m4a`, update the `.player-title` date
+  in `index.html`.
