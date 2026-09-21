@@ -253,13 +253,6 @@ img.host-photo {
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .listen-live:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(227, 168, 60, 0.5); }
-.listen-note { color: var(--muted); font-size: 0.9rem; margin-top: 0.9rem; }
-.listen-alt { color: var(--muted); font-size: 0.95rem; margin-top: 0.7rem; }
-.listen-alt a {
-  color: var(--gold-soft); font-weight: 700; text-decoration: none;
-  border-bottom: 1px solid rgba(227, 168, 60, 0.5);
-}
-.listen-alt a:hover { color: var(--gold); border-bottom-color: var(--gold); }
 
 /* ---------- footer ---------- */
 footer {
