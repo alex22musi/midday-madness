@@ -22,6 +22,11 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div id="live-banner" class="live-banner" hidden>
+  <span class="live-dot" aria-hidden="true"></span>
+  <span class="live-text"><strong id="live-banner-label">ON AIR NOW</strong><span id="live-banner-sub">Midday Madness is live — tap to listen</span></span>
+  <a class="live-btn" href="https://www.wiux.org/page/991fm" target="_blank" rel="noopener">Listen live</a>
+</div>
 <header class="nav">
   <div class="nav-inner">
     <a class="brand" href="#top">
@@ -38,6 +43,16 @@
 </header>
 
 <main id="top">
+  <section id="live-hero" class="live-hero" hidden>
+    <p class="live-kicker"><span class="live-dot" aria-hidden="true"></span><span id="live-hero-label">ON AIR NOW</span></p>
+    <h2>Midday Madness is live</h2>
+    <p id="live-hero-sub" class="live-sub">Wednesdays 1&ndash;2 PM ET on WIUX 99.1 FM.</p>
+    <a class="listen-live" href="https://www.wiux.org/page/991fm" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 0 1 9 9h-2a7 7 0 0 0-7-7V3z"/><path d="M12 7a5 5 0 0 1 5 5h-2a3 3 0 0 0-3-3V7z"/><circle cx="12" cy="12" r="1.6"/></svg>
+      Listen live on WIUX
+    </a>
+    <p class="live-cal"><a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Midday%20Madness%20LIVE&dates=20260923T170000Z/20260923T180000Z&recur=RRULE%3AFREQ%3DWEEKLY%3BBYDAY%3DWE&ctz=America%2FIndiana%2FIndianapolis&details=IU%27s%20midday%20sports%20talk%2C%20live%20on%20WIUX%2099.1%20FM." target="_blank" rel="noopener">Add Wednesdays 1 PM to your calendar</a></p>
+  </section>
   <section class="hero">
     <img class="hero-logo" src="assets/logo.jpg" alt="Midday Madness logo">
     <h1>MIDDAY MADNESS</h1>
@@ -166,6 +181,72 @@
 <footer>
   <p>&copy; 2026 Midday Madness &bull; WIUX 99.1</p>
 </footer>
+<script>
+/* ---------- live show mode: countdown from 12:30 PM, live 1:00-2:00 PM ET Wednesdays ---------- */
+(function () {
+  var SHOW_TZ = 'America/Indiana/Indianapolis';
+  // Manual override for weeks with no show (holidays, breaks): set true to force
+  // live mode on, false to force it off, or leave null for automatic.
+  var LIVE_OVERRIDE = null;
+
+  var preview = new URLSearchParams(location.search).get('preview'); // ?preview=live | ?preview=soon
+  var banner = document.getElementById('live-banner');
+  var hero = document.getElementById('live-hero');
+  var bannerLabel = document.getElementById('live-banner-label');
+  var bannerSub = document.getElementById('live-banner-sub');
+  var heroLabel = document.getElementById('live-hero-label');
+  var heroSub = document.getElementById('live-hero-sub');
+  var baseTitle = document.title;
+
+  function showParts(d) {
+    var out = {};
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: SHOW_TZ, weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false
+    }).formatToParts(d).forEach(function (p) { out[p.type] = p.value; });
+    return { weekday: out.weekday, minutes: parseInt(out.hour, 10) * 60 + parseInt(out.minute, 10) };
+  }
+
+  function currentState() {
+    if (preview === 'live') return 'live';
+    if (preview === 'soon') return 'soon';
+    if (LIVE_OVERRIDE === true) return 'live';
+    if (LIVE_OVERRIDE === false) return 'off';
+    var t = showParts(new Date());
+    if (t.weekday !== 'Wed') return 'off';
+    if (t.minutes >= 13 * 60 && t.minutes < 14 * 60) return 'live';      // 1:00-2:00 PM ET
+    if (t.minutes >= 12 * 60 + 30 && t.minutes < 13 * 60) return 'soon'; // 12:30-1:00 PM ET countdown
+    return 'off';
+  }
+
+  function apply() {
+    var s = currentState();
+    var on = s !== 'off';
+    document.body.classList.toggle('live-now', s === 'live');
+    document.body.classList.toggle('live-soon', s === 'soon');
+    banner.hidden = !on;
+    hero.hidden = !on;
+    if (s === 'live') {
+      bannerLabel.textContent = 'ON AIR NOW';
+      bannerSub.textContent = 'Midday Madness is live until 2 PM ET \u2014 tap to listen';
+      heroLabel.textContent = 'ON AIR NOW';
+      heroSub.textContent = 'Midday Madness is live until 2 PM ET on WIUX 99.1 FM.';
+      document.title = '\u25CF LIVE: ' + baseTitle;
+    } else if (s === 'soon') {
+      var mins = Math.max(1, 13 * 60 - showParts(new Date()).minutes);
+      bannerLabel.textContent = 'LIVE SOON';
+      bannerSub.textContent = 'Midday Madness starts in ' + mins + ' min \u2014 get ready';
+      heroLabel.textContent = 'STARTING SOON';
+      heroSub.textContent = 'Midday Madness goes live in ' + mins + ' minute' + (mins === 1 ? '' : 's') + ' on WIUX 99.1 FM.';
+      document.title = 'Live in ' + mins + ' min: ' + baseTitle;
+    } else {
+      document.title = baseTitle;
+    }
+  }
+
+  apply();
+  setInterval(apply, 30000);
+})();
+</script>
 <script>
 (function () {
   var audio = document.getElementById('player-audio');
