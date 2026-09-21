@@ -3,6 +3,12 @@
 How clips go from Wednesday's show to the website and socials, the same way every week.
 Owner: Alex. Last updated: 2026-09-21.
 
+## -1. Pre-show: the agenda (Tuesday + Wednesday morning)
+
+- Build the show agenda in **Google Docs** before the show; refresh it **morning-of**.
+- **Email it to Alex and Sam** ([emails on file]) so both can make edits and prep.
+- Keep a copy in `~/workspace/your_files/sports-podcast-agenda/` for the archive.
+
 ## 0. Pick the moments (Wednesday after the show)
 
 - Log timestamps in the Clip Log doc while the show is fresh (3–4 candidates).
@@ -24,6 +30,12 @@ Thumbnails are designed **before** the clip is cut, so the clip's look is locked
 - Export as JPG, name them `poster1.jpg`, `poster2.jpg`, `poster3.jpg`
   (match the clip number).
 - The chosen thumbnail becomes the clip's `poster` on the website.
+- Thumbnail style (locked 2026-09-21 from Alex's feedback): byline
+  `by Alex Musicus & Sam Singer` sits **below the logo** (not on it), smaller
+  size, higher-flare font; logo brightened. A-style direction: navy/gold.
+- One **recurring 1080 × 1920 clip background** is used behind every clip
+  (Canva export, PNG): `MIDDAY MADNESS` header, clean title space, footer
+  `Every Wednesday at 1 PM • WIUX 99.1`, correct M badge.
 
 ## 2. Cut the audio
 
@@ -85,7 +97,15 @@ python3 render_clips_v3.py
   confirm the live page plays them.
 - **Socials**: post the MP4 + thumbnail per the Instagram plan
   (`~/workspace/your_files/midday-madness-instagram-plan.md`).
+  Posting cadence (locked 2026-09-21): **college football clips on Fridays and
+  Saturdays, NFL clips on Sundays and Mondays.** Website clips section follows
+  the same split.
 - **Drive**: upload approved finals to the episode folder.
+- **Wednesday live mode is automatic**: the site shows a "LIVE SOON" countdown
+  12:30–1:00 PM ET and an "ON AIR NOW" takeover 1:00–2:00 PM ET every Wednesday
+  (America/Indiana/Indianapolis). No action needed on show day. For no-show weeks
+  (breaks/holidays), set `LIVE_OVERRIDE = false` in `index.html`; preview with
+  `?preview=live` / `?preview=soon`.
 
 ## 8. Roll to next week
 
