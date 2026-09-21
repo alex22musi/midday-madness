@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Midday Madness — WIUX 99.1</title>
 <meta name="description" content="Midday Madness: IU's midday sports talk show. Every Wednesday at 1 PM on WIUX 99.1 FM.">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="apple-touch-icon" href="assets/logo.jpg">
+<meta name="theme-color" content="#0a0e1c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Midday Madness">
+<meta property="og:title" content="Midday Madness — WIUX 99.1">
+<meta property="og:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM. Watch the latest clips and hear the full episode.">
+<meta property="og:url" content="https://alex22musi.github.io/midday-madness/">
+<meta property="og:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
+<meta property="og:image:alt" content="Midday Madness logo">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Midday Madness — WIUX 99.1">
+<meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
+<meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -65,7 +79,26 @@
   <section id="episode" class="episode">
     <h2>FULL EPISODE</h2>
     <p class="episode-title">September 16, 2026 &mdash; the full hour</p>
-    <audio controls preload="metadata" src="assets/full-show.m4a"></audio>
+    <div class="player" id="player">
+      <audio id="player-audio" preload="metadata" src="assets/full-show.m4a"></audio>
+      <button class="player-play" id="player-toggle" aria-label="Play episode">
+        <svg id="icon-play" viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="icon-pause" viewBox="0 0 24 24" width="26" height="26" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <div class="player-center">
+        <div class="player-times">
+          <span id="player-current">0:00</span>
+          <span id="player-duration">--:--</span>
+        </div>
+        <div class="player-bar" id="player-bar" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="player-buffered" id="player-buffered"></div>
+          <div class="player-progress" id="player-progress"></div>
+        </div>
+      </div>
+      <button class="player-chip" id="player-back" aria-label="Back 15 seconds">&#8634; 15</button>
+      <button class="player-chip" id="player-speed" aria-label="Playback speed">1&times;</button>
+    </div>
+    <p class="player-hint">Stream the full hour &mdash; debates, hot takes, and the best of Wednesday&rsquo;s show.</p>
   </section>
 
   <section id="about" class="about">
@@ -77,7 +110,7 @@
         <img class="host-photo" src="assets/alex-headshot.jpg" alt="Alex Musicus">
         <h3><a class="host-link" href="https://www.linkedin.com/in/alexander-musicus" target="_blank" rel="noopener">Alex Musicus</a></h3>
         <p class="role">Co-host</p>
-        <p class="bio">Student in The Media School at Indiana University, majoring in sports media with a minor in business at the Kelley School of Business.</p>
+        <p class="bio">Sports media student in The Media School at Indiana University, minoring in business at the Kelley School of Business. Co-host and co-creator of Midday Madness on WIUX 99.1 FM — on the mic every Wednesday breaking down college football, the NFL, and IU sports.</p>
       </div>
       <div class="host">
         <img class="host-photo" src="assets/sam-headshot.jpg" alt="Sam Singer">
@@ -98,5 +131,80 @@
 <footer>
   <p>&copy; 2026 Midday Madness &bull; WIUX 99.1</p>
 </footer>
+<script>
+(function () {
+  var audio = document.getElementById('player-audio');
+  var toggle = document.getElementById('player-toggle');
+  var iconPlay = document.getElementById('icon-play');
+  var iconPause = document.getElementById('icon-pause');
+  var bar = document.getElementById('player-bar');
+  var progress = document.getElementById('player-progress');
+  var buffered = document.getElementById('player-buffered');
+  var cur = document.getElementById('player-current');
+  var dur = document.getElementById('player-duration');
+  var back = document.getElementById('player-back');
+  var speed = document.getElementById('player-speed');
+  var speeds = [1, 1.25, 1.5, 2];
+  var speedIdx = 0;
+
+  function fmt(s) {
+    if (!isFinite(s) || s < 0) return '--:--';
+    s = Math.floor(s);
+    var m = Math.floor(s / 60), h = Math.floor(m / 60);
+    m = m % 60; s = s % 60;
+    var mm = (h ? m : m) + '', ss = (s < 10 ? '0' : '') + s;
+    return (h ? h + ':' + (m < 10 ? '0' : '') + m : m) + ':' + ss;
+  }
+  function setPlaying(playing) {
+    iconPlay.style.display = playing ? 'none' : '';
+    iconPause.style.display = playing ? '' : 'none';
+    toggle.setAttribute('aria-label', playing ? 'Pause episode' : 'Play episode');
+  }
+  toggle.addEventListener('click', function () {
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  });
+  audio.addEventListener('play', function () { setPlaying(true); });
+  audio.addEventListener('pause', function () { setPlaying(false); });
+  audio.addEventListener('loadedmetadata', function () {
+    dur.textContent = fmt(audio.duration);
+    bar.setAttribute('aria-valuemax', Math.round(audio.duration));
+  });
+  audio.addEventListener('timeupdate', function () {
+    if (!audio.duration) return;
+    var pct = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = pct + '%';
+    bar.style.setProperty('--knob', pct + '%');
+    bar.setAttribute('aria-valuenow', Math.round(audio.currentTime));
+    cur.textContent = fmt(audio.currentTime);
+  });
+  audio.addEventListener('progress', function () {
+    if (!audio.duration) return;
+    try {
+      var b = audio.buffered;
+      if (b.length) buffered.style.width = (b.end(b.length - 1) / audio.duration * 100) + '%';
+    } catch (e) {}
+  });
+  function seek(clientX) {
+    var r = bar.getBoundingClientRect();
+    var ratio = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    if (audio.duration) audio.currentTime = ratio * audio.duration;
+  }
+  var scrubbing = false;
+  bar.addEventListener('pointerdown', function (e) { scrubbing = true; bar.setPointerCapture(e.pointerId); seek(e.clientX); });
+  bar.addEventListener('pointermove', function (e) { if (scrubbing) seek(e.clientX); });
+  bar.addEventListener('pointerup', function () { scrubbing = false; });
+  bar.addEventListener('keydown', function (e) {
+    if (!audio.duration) return;
+    if (e.key === 'ArrowRight') audio.currentTime = Math.min(audio.duration, audio.currentTime + 15);
+    if (e.key === 'ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime - 15);
+  });
+  back.addEventListener('click', function () { audio.currentTime = Math.max(0, audio.currentTime - 15); });
+  speed.addEventListener('click', function () {
+    speedIdx = (speedIdx + 1) % speeds.length;
+    audio.playbackRate = speeds[speedIdx];
+    speed.innerHTML = String(speeds[speedIdx]).replace('.', '&middot;') + '&times;';
+  });
+})();
+</script>
 </body>
 </html>
