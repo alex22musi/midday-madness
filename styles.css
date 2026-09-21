@@ -256,6 +256,8 @@ img.host-photo {
 
 /* ---------- live mode ---------- */
 [hidden] { display: none !important; }
+/* When live mode is on, the sticky nav sits below the sticky live banner. */
+body.live-now .nav, body.live-soon .nav { top: var(--live-banner-h, 64px); }
 .live-banner {
   position: sticky; top: 0; z-index: 200;
   display: flex; align-items: center; gap: 0.75rem;

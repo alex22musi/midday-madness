@@ -225,6 +225,9 @@
     document.body.classList.toggle('live-soon', s === 'soon');
     banner.hidden = !on;
     hero.hidden = !on;
+    // Keep the sticky nav below the sticky banner while scrolling.
+    document.documentElement.style.setProperty(
+      '--live-banner-h', (on ? banner.offsetHeight : 0) + 'px');
     if (s === 'live') {
       bannerLabel.textContent = 'ON AIR NOW';
       bannerSub.textContent = 'Midday Madness is live until 2 PM ET \u2014 tap to listen';
@@ -245,6 +248,7 @@
 
   apply();
   setInterval(apply, 30000);
+  window.addEventListener('resize', apply);
 })();
 </script>
 <script>
