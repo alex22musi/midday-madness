@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20260922b">
 </head>
 <body>
 <div id="live-banner" class="live-banner" hidden>
@@ -230,8 +230,9 @@
     banner.hidden = !on;
     hero.hidden = !on;
     // Keep the sticky nav below the sticky banner while scrolling.
-    document.documentElement.style.setProperty(
-      '--live-banner-h', (on ? banner.offsetHeight : 0) + 'px');
+    var h = 0;
+    if (on) { h = Math.ceil(banner.getBoundingClientRect().height); }
+    document.documentElement.style.setProperty('--live-banner-h', h + 'px');
     if (s === 'live') {
       bannerLabel.textContent = 'ON AIR NOW';
       bannerSub.textContent = 'Midday Madness is live until 2 PM ET \u2014 tap to listen';
@@ -253,6 +254,7 @@
   apply();
   setInterval(apply, 30000);
   window.addEventListener('resize', apply);
+  window.addEventListener('load', apply);
 })();
 </script>
 <script>

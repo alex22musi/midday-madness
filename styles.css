@@ -90,7 +90,7 @@ section h2 {
 }
 .clip-card video {
   width: 100%; aspect-ratio: 9 / 16; display: block; background: #000;
-  max-height: 480px; object-fit: contain;
+  object-fit: contain;
 }
 .clip-body { padding: 1.1rem 1.2rem 1.4rem; }
 .clip-body h3 { font-size: 1.05rem; margin-bottom: 0.15rem; }
@@ -276,7 +276,7 @@ body.live-soon .live-banner {
   box-shadow: 0 8px 28px rgba(227, 168, 60, 0.2);
 }
 .live-dot {
-  width: 0.75rem; height: 0.75rem; border-radius: 50%; flex: none;
+  display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 50%; flex: none;
   background: #ff5b61;
   box-shadow: 0 0 0 0 rgba(255, 91, 97, 0.7), 0 0 12px rgba(255, 91, 97, 0.9);
   animation: live-pulse 1.4s ease-in-out infinite;
