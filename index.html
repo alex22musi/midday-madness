@@ -244,7 +244,8 @@
       '&dates=' + fmt(startMs) + '/' + fmt(startMs + 3600000) +
       '&recur=' + encodeURIComponent('RRULE:FREQ=WEEKLY;BYDAY=WE') +
       '&ctz=' + encodeURIComponent(SHOW_TZ) +
-      '&details=' + encodeURIComponent("IU's midday sports talk, live on WIUX 99.1 FM.");
+      '&details=' + encodeURIComponent("IU's midday sports talk, live on WIUX 99.1 FM.") +
+      '&location=' + encodeURIComponent('https://alex22musi.github.io/midday-madness');
   })();
 
   function showParts(d) {
@@ -290,7 +291,7 @@
       var hrs = Math.floor(totalMins / 60), mins = totalMins % 60;
       var when = hrs > 0 ? hrs + ' hr ' + mins + ' min' : totalMins + ' minutes';
       bannerLabel.textContent = 'LIVE IN ' + when.toUpperCase();
-      bannerSub.textContent = 'Midday Madness on WIUX 99.1 FM \u2014 get ready';
+      bannerSub.textContent = 'Midday Madness on WIUX 99.1 FM';
       heroLabel.textContent = 'STARTING SOON';
       heroHeading.textContent = 'Midday Madness starts soon';
       heroSub.innerHTML = 'Midday Madness goes live <strong>in ' + when + '</strong> on WIUX 99.1 FM.';
