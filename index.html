@@ -48,13 +48,13 @@
   <section id="live-hero" class="live-hero" hidden>
     <div class="live-hero-inner">
       <p class="live-kicker"><span class="live-dot" aria-hidden="true"></span><span id="live-hero-label">ON AIR NOW</span></p>
-      <h2>Midday Madness is live</h2>
+      <h2 id="live-hero-heading">Midday Madness is live</h2>
       <p id="live-hero-sub" class="live-sub">Wednesdays 1&ndash;2 PM ET on WIUX 99.1 FM.</p>
       <a class="listen-live" href="https://www.wiux.org/page/991fm" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 3a9 9 0 0 1 9 9h-2a7 7 0 0 0-7-7V3z"/><path d="M12 7a5 5 0 0 1 5 5h-2a3 3 0 0 0-3-3V7z"/><circle cx="12" cy="12" r="1.6"/></svg>
         Listen live on WIUX
       </a>
-      <p class="live-cal"><a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Midday%20Madness%20LIVE&dates=20260923T170000Z/20260923T180000Z&recur=RRULE%3AFREQ%3DWEEKLY%3BBYDAY%3DWE&ctz=America%2FIndiana%2FIndianapolis&details=IU%27s%20midday%20sports%20talk%2C%20live%20on%20WIUX%2099.1%20FM." target="_blank" rel="noopener">Add Wednesdays 1 PM to your calendar</a></p>
+      <p class="live-cal"><a id="live-cal-link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Midday%20Madness%20LIVE" target="_blank" rel="noopener">Add Wednesdays 1 PM to your calendar</a></p>
     </div>
   </section>
   <section class="hero">
@@ -200,7 +200,52 @@
   var bannerSub = document.getElementById('live-banner-sub');
   var heroLabel = document.getElementById('live-hero-label');
   var heroSub = document.getElementById('live-hero-sub');
+  var heroHeading = document.getElementById('live-hero-heading');
+  var calLink = document.getElementById('live-cal-link');
   var baseTitle = document.title;
+
+  // Point the calendar link at the upcoming show Wednesday (1-2 PM ET), so the
+  // date never goes stale. Today counts if it's Wednesday before 2 PM ET.
+  (function buildCalLink() {
+    if (!calLink) return;
+    function etParts(d, opts) {
+      var out = {};
+      var o = { timeZone: SHOW_TZ, hour12: false };
+      for (var k in opts) o[k] = opts[k];
+      new Intl.DateTimeFormat('en-US', o).formatToParts(d).forEach(function (p) { out[p.type] = p.value; });
+      return out;
+    }
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    var target = null, nowMs = Date.now();
+    for (var k = 0; k < 8; k++) {
+      var cand = new Date(nowMs + k * 86400000);
+      var p = etParts(cand, { weekday: 'short', hour: 'numeric', minute: 'numeric' });
+      var mins = parseInt(p.hour, 10) * 60 + parseInt(p.minute, 10);
+      if (p.weekday === 'Wed' && (k > 0 || mins < 14 * 60)) {
+        var ymd = etParts(cand, { year: 'numeric', month: '2-digit', day: '2-digit' });
+        target = { y: +ymd.year, m: +ymd.month, d: +ymd.day };
+        break;
+      }
+    }
+    if (!target) return;
+    // 1 PM ET wall clock -> UTC, accounting for EDT/EST on that date
+    var guess = Date.UTC(target.y, target.m - 1, target.d, 17, 0, 0);
+    var tp = etParts(new Date(guess), { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    var asUtc = Date.UTC(+tp.year, +tp.month - 1, +tp.day, (+tp.hour) % 24, +tp.minute, +tp.second);
+    var offMin = Math.round((asUtc - guess) / 60000);
+    var startMs = Date.UTC(target.y, target.m - 1, target.d, 13, 0, 0) - offMin * 60000;
+    function fmt(ms) {
+      var d = new Date(ms);
+      return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) +
+        'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + '00Z';
+    }
+    calLink.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text=' + encodeURIComponent('Midday Madness LIVE') +
+      '&dates=' + fmt(startMs) + '/' + fmt(startMs + 3600000) +
+      '&recur=' + encodeURIComponent('RRULE:FREQ=WEEKLY;BYDAY=WE') +
+      '&ctz=' + encodeURIComponent(SHOW_TZ) +
+      '&details=' + encodeURIComponent("IU's midday sports talk, live on WIUX 99.1 FM.");
+  })();
 
   function showParts(d) {
     var out = {};
@@ -237,6 +282,7 @@
       bannerLabel.textContent = 'ON AIR NOW';
       bannerSub.textContent = 'Midday Madness is live until 2 PM ET \u2014 tap to listen';
       heroLabel.textContent = 'ON AIR NOW';
+      heroHeading.textContent = 'Midday Madness is live';
       heroSub.textContent = 'Midday Madness is live until 2 PM ET on WIUX 99.1 FM.';
       document.title = '\u25CF LIVE: ' + baseTitle;
     } else if (s === 'soon') {
@@ -246,6 +292,7 @@
       bannerLabel.textContent = 'LIVE IN ' + when.toUpperCase();
       bannerSub.textContent = 'Midday Madness on WIUX 99.1 FM \u2014 get ready';
       heroLabel.textContent = 'STARTING SOON';
+      heroHeading.textContent = 'Midday Madness starts soon';
       heroSub.innerHTML = 'Midday Madness goes live <strong>in ' + when + '</strong> on WIUX 99.1 FM.';
       document.title = 'Live in ' + when + ': ' + baseTitle;
     } else {
