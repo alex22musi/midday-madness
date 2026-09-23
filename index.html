@@ -242,11 +242,11 @@
     } else if (s === 'soon') {
       var totalMins = Math.max(1, 13 * 60 - showParts(new Date()).minutes);
       var hrs = Math.floor(totalMins / 60), mins = totalMins % 60;
-      var when = hrs > 0 ? hrs + ' hr ' + mins + ' min' : mins + ' min';
-      bannerLabel.textContent = 'LIVE SOON';
-      bannerSub.textContent = 'Midday Madness starts in ' + when + ' \u2014 get ready';
+      var when = hrs > 0 ? hrs + ' hr ' + mins + ' min' : totalMins + ' minutes';
+      bannerLabel.textContent = 'LIVE IN ' + when.toUpperCase();
+      bannerSub.textContent = 'Midday Madness on WIUX 99.1 FM \u2014 get ready';
       heroLabel.textContent = 'STARTING SOON';
-      heroSub.textContent = 'Midday Madness goes live in ' + when + ' on WIUX 99.1 FM.';
+      heroSub.innerHTML = 'Midday Madness goes live <strong>in ' + when + '</strong> on WIUX 99.1 FM.';
       document.title = 'Live in ' + when + ': ' + baseTitle;
     } else {
       document.title = baseTitle;
