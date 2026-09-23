@@ -186,7 +186,7 @@
   <p>&copy; 2026 Midday Madness &bull; WIUX 99.1 &bull; <a href="privacy.html">Privacy Policy</a></p>
 </footer>
 <script>
-/* ---------- live show mode: countdown from 12:30 PM, live 1:00-2:00 PM ET Wednesdays ---------- */
+/* ---------- live show mode: countdown from midnight, live 1:00-2:00 PM ET Wednesdays ---------- */
 (function () {
   var SHOW_TZ = 'America/Indiana/Indianapolis';
   // Manual override for weeks with no show (holidays, breaks): set true to force
@@ -217,8 +217,8 @@
     if (LIVE_OVERRIDE === false) return 'off';
     var t = showParts(new Date());
     if (t.weekday !== 'Wed') return 'off';
-    if (t.minutes >= 13 * 60 && t.minutes < 14 * 60) return 'live';      // 1:00-2:00 PM ET
-    if (t.minutes >= 12 * 60 + 30 && t.minutes < 13 * 60) return 'soon'; // 12:30-1:00 PM ET countdown
+    if (t.minutes >= 13 * 60 && t.minutes < 14 * 60) return 'live'; // 1:00-2:00 PM ET
+    if (t.minutes < 13 * 60) return 'soon';                        // midnight-1:00 PM ET countdown
     return 'off';
   }
 
@@ -240,12 +240,14 @@
       heroSub.textContent = 'Midday Madness is live until 2 PM ET on WIUX 99.1 FM.';
       document.title = '\u25CF LIVE: ' + baseTitle;
     } else if (s === 'soon') {
-      var mins = Math.max(1, 13 * 60 - showParts(new Date()).minutes);
+      var totalMins = Math.max(1, 13 * 60 - showParts(new Date()).minutes);
+      var hrs = Math.floor(totalMins / 60), mins = totalMins % 60;
+      var when = hrs > 0 ? hrs + ' hr ' + mins + ' min' : mins + ' min';
       bannerLabel.textContent = 'LIVE SOON';
-      bannerSub.textContent = 'Midday Madness starts in ' + mins + ' min \u2014 get ready';
+      bannerSub.textContent = 'Midday Madness starts in ' + when + ' \u2014 get ready';
       heroLabel.textContent = 'STARTING SOON';
-      heroSub.textContent = 'Midday Madness goes live in ' + mins + ' minute' + (mins === 1 ? '' : 's') + ' on WIUX 99.1 FM.';
-      document.title = 'Live in ' + mins + ' min: ' + baseTitle;
+      heroSub.textContent = 'Midday Madness goes live in ' + when + ' on WIUX 99.1 FM.';
+      document.title = 'Live in ' + when + ': ' + baseTitle;
     } else {
       document.title = baseTitle;
     }
