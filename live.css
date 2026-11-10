@@ -164,6 +164,13 @@ body.live-now .livepage-hero {
   15% { opacity: 1; }
   100% { transform: translateY(-140px) scale(1.25); opacity: 0; }
 }
+.react-panel { position: relative; overflow: hidden; }
+.react-counts { display: flex; flex-wrap: wrap; gap: 0.5rem; position: relative; z-index: 1; }
+.react-count {
+  background: rgba(227, 168, 60, 0.10); border: 1px solid rgba(227, 168, 60, 0.35);
+  color: var(--gold); border-radius: 999px; padding: 0.35rem 0.8rem;
+  font-weight: 700; font-size: 0.95rem;
+}
 .react-bar { display: flex; gap: 0.35rem; margin-left: auto; }
 .react-btn {
   background: rgba(244, 241, 232, 0.07);

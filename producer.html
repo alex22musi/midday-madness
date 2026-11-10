@@ -9,7 +9,7 @@
 <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
 <meta name="theme-color" content="#0a0e1c">
 <link rel="stylesheet" href="styles.css?v=20261110a">
-<link rel="stylesheet" href="live.css?v=20261110b">
+<link rel="stylesheet" href="live.css?v=20261110c">
 </head>
 <body>
 <header class="nav">
@@ -72,6 +72,12 @@
           <span class="listeners-label">listening now</span>
         </div>
       </div>
+    </div>
+    <div class="panel wide react-panel">
+      <h2>LIVE REACTIONS</h2>
+      <div class="reaction-layer" id="prod-react-layer" aria-hidden="true"></div>
+      <div class="react-counts" id="prod-react-counts"></div>
+      <p class="section-note" style="margin:0.45rem 0 0;text-align:left">Listener taps land here the second they happen. Counts are for this session — they reset on reload.</p>
     </div>
     <div class="panel wide">
       <h2>SEGMENTS</h2>
@@ -316,6 +322,37 @@
       });
       chan.subscribe();
     } catch (e) {}
+
+    /* ---- live reactions (listener -> producer) ---- */
+    (function () {
+      var countsEl = MM.el('prod-react-counts');
+      var layer = MM.el('prod-react-layer');
+      if (!countsEl || !layer) return;
+      var counts = {};
+      MM.REACTION_EMOJI.forEach(function (e) { counts[e] = 0; });
+      function renderCounts() {
+        countsEl.innerHTML = MM.REACTION_EMOJI.map(function (e) {
+          return '<span class="react-count">' + e + ' &times; ' + counts[e] + '</span>';
+        }).join('');
+      }
+      renderCounts();
+      try {
+        sb.channel('mm-reactions')
+          .on('broadcast', { event: 'react' }, function (msg) {
+            var e = msg && msg.payload && msg.payload.emoji;
+            if (!e || !(e in counts)) return;
+            counts[e]++;
+            renderCounts();
+            var s = document.createElement('span');
+            s.className = 'react-burst';
+            s.textContent = e;
+            s.style.left = (15 + Math.random() * 70) + '%';
+            layer.appendChild(s);
+            setTimeout(function () { s.remove(); }, 1600);
+          })
+          .subscribe();
+      } catch (err) {}
+    })();
 
     /* ---- realtime refresh ---- */
     try {

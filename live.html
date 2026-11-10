@@ -15,7 +15,7 @@
 <meta property="og:url" content="https://alex22musi.github.io/midday-madness/live.html">
 <meta property="og:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
 <link rel="stylesheet" href="styles.css?v=20261110a">
-<link rel="stylesheet" href="live.css?v=20261110b">
+<link rel="stylesheet" href="live.css?v=20261110c">
 </head>
 <body>
 <header class="nav">
@@ -379,6 +379,20 @@
     setTimeout(function () { s.remove(); }, 1600);
   }
 
+  // One shared, subscribed channel for both sending and receiving. Sending on
+  // a fresh unsubscribed channel (the old code) silently dropped reactions.
+  var reactChan = null;
+  if (sb) {
+    try {
+      reactChan = sb.channel('mm-reactions');
+      reactChan
+        .on('broadcast', { event: 'react' }, function (msg) {
+          if (msg && msg.payload && msg.payload.emoji) burst(msg.payload.emoji);
+        })
+        .subscribe();
+    } catch (e) { reactChan = null; }
+  }
+
   MM.REACTION_EMOJI.forEach(function (e) {
     var b = document.createElement('button');
     b.type = 'button';
@@ -389,22 +403,12 @@
       var r = reactBar.getBoundingClientRect();
       var xPct = r.width ? ((ev.clientX - r.left) / r.width) * 100 : null;
       burst(e, xPct);
-      if (sb) {
-        try { sb.channel('mm-reactions').send({ type: 'broadcast', event: 'react', payload: { emoji: e } }); } catch (err) {}
+      if (reactChan) {
+        try { reactChan.send({ type: 'broadcast', event: 'react', payload: { emoji: e } }); } catch (err) {}
       }
     });
     reactBar.appendChild(b);
   });
-
-  if (sb) {
-    try {
-      sb.channel('mm-reactions')
-        .on('broadcast', { event: 'react' }, function (msg) {
-          if (msg && msg.payload && msg.payload.emoji) burst(msg.payload.emoji);
-        })
-        .subscribe();
-    } catch (e) {}
-  }
 
   /* ---------- listener count (presence) ---------- */
   var listenersEl = MM.el('player-listeners');
