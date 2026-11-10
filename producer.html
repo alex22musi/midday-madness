@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midday Madness — Producer Console</title>
+<meta name="description" content="Crew-only producer console for the Midday Madness live show.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<meta name="theme-color" content="#0a0e1c">
+<link rel="stylesheet" href="styles.css?v=20260922b">
+<link rel="stylesheet" href="live.css?v=20260923a">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.jpg" alt="Midday Madness logo">
+      <span>MIDDAY MADNESS</span>
+    </a>
+    <nav>
+      <a href="live.html">Live page</a>
+      <a href="index.html">Home</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="producer-head">
+    <h1>PRODUCER CONSOLE</h1>
+    <p>Crew only — drives the live page in real time.</p>
+  </div>
+
+  <!-- key gate (only if PRODUCER_KEY is set in config) -->
+  <div class="key-gate" id="key-gate" hidden>
+    <h2>CREW ACCESS</h2>
+    <p class="section-note">Enter the producer key to continue.</p>
+    <input type="password" id="key-input" placeholder="Producer key" aria-label="Producer key" autocomplete="off">
+    <button class="btn gold" id="key-submit">Unlock</button>
+    <p class="empty-note" id="key-error" hidden style="color:#ffb3b6;margin-top:0.6rem">Wrong key — try again.</p>
+  </div>
+
+  <!-- setup instructions (when Supabase is not configured) -->
+  <div class="setup-panel" id="setup-panel" hidden>
+    <div class="panel wide">
+      <h2>BACKEND NOT CONNECTED</h2>
+      <p class="section-note" style="text-align:left;margin:0 0 0.6rem">The live backend isn't configured yet, so there's nothing to control. One-time setup:</p>
+      <ol>
+        <li>Create a free project at <strong>supabase.com</strong>.</li>
+        <li>Open the SQL editor and run the schema in <code>supabase/schema.sql</code> (in this repo).</li>
+        <li>Copy the <strong>Project URL</strong> and <strong>anon public key</strong> from Project Settings → API.</li>
+        <li>Paste them into <code>SUPABASE_URL</code> / <code>SUPABASE_ANON_KEY</code> at the top of <code>live-shared.js</code> and redeploy.</li>
+      </ol>
+      <p class="section-note" style="text-align:left;margin:0">Full walkthrough: <code>SUPABASE_SETUP.md</code>. Until then, the listener page runs fully on its static fallbacks.</p>
+    </div>
+  </div>
+
+  <!-- console -->
+  <div class="producer-grid" id="console" hidden>
+    <div class="panel">
+      <h2>SHOW CONTROL</h2>
+      <p class="show-state-line" id="show-state-line">Loading…</p>
+      <div class="row">
+        <button class="btn go" id="btn-golive">Go Live</button>
+        <button class="btn stop" id="btn-endshow">End Show</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>LISTENERS</h2>
+      <p class="listener-big" id="prod-listeners">—</p>
+      <p class="show-state-line">connected right now</p>
+    </div>
+    <div class="panel wide">
+      <h2>SEGMENTS</h2>
+      <div id="prod-segments"></div>
+      <div class="add-row">
+        <input type="text" id="seg-input" maxlength="120" placeholder="New segment title…" aria-label="New segment title">
+        <button class="btn gold" id="seg-add">Add</button>
+      </div>
+      <button class="btn gold advance-btn" id="seg-advance">Advance ▸ next segment live</button>
+    </div>
+    <div class="panel wide">
+      <h2>QUESTION QUEUE</h2>
+      <div id="prod-questions"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2026 Midday Madness &bull; WIUX 99.1 &bull; <a href="index.html">Home</a></p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="live-shared.js?v=20260923d"></script>
+<script>
+(function () {
+  'use strict';
+  var MM = window.MM;
+
+  var gate = MM.el('key-gate');
+  var setupPanel = MM.el('setup-panel');
+  var consoleEl = MM.el('console');
+
+  // Optional key gate (only when PRODUCER_KEY is set in config).
+  var needKey = !!MM.CONFIG.PRODUCER_KEY;
+  var unlocked = false;
+  try { unlocked = sessionStorage.getItem('mm_prod') === MM.CONFIG.PRODUCER_KEY; } catch (e) {}
+  if (needKey && !unlocked) {
+    gate.hidden = false;
+    MM.el('key-submit').addEventListener('click', function () {
+      var v = MM.el('key-input').value;
+      if (v === MM.CONFIG.PRODUCER_KEY) {
+        try { sessionStorage.setItem('mm_prod', v); } catch (e) {}
+        gate.hidden = true;
+        boot();
+      } else {
+        MM.el('key-error').hidden = false;
+      }
+    });
+    MM.el('key-input').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') MM.el('key-submit').click();
+    });
+    return;
+  }
+  boot();
+
+  function boot() {
+    var sb = MM.supabaseClient();
+    if (!sb) {
+      setupPanel.hidden = false;
+      return;
+    }
+    consoleEl.hidden = false;
+    run(sb);
+  }
+
+  function run(sb) {
+    var showId = null;
+
+    function todayRow() {
+      return sb.from('shows').upsert({ show_date: MM.todayKey() }, { onConflict: 'show_date' })
+        .select('id,is_live,started_at,ended_at').single();
+    }
+
+    function refresh() {
+      todayRow().then(function (res) {
+        if (res.error || !res.data) return;
+        showId = res.data.id;
+        renderShowState(res.data);
+        loadSegments();
+        loadQuestions();
+      });
+    }
+
+    function renderShowState(row) {
+      var line = MM.el('show-state-line');
+      if (row.is_live) {
+        line.innerHTML = 'Status: <strong style="color:#ffb3b6">LIVE</strong>' +
+          (row.started_at ? ' since ' + MM.esc(new Date(row.started_at).toLocaleTimeString()) : '');
+        MM.el('btn-golive').disabled = true;
+        MM.el('btn-endshow').disabled = false;
+      } else {
+        line.innerHTML = 'Status: <strong>off air</strong>' +
+          (row.ended_at ? ' — ended ' + MM.esc(new Date(row.ended_at).toLocaleTimeString()) : '');
+        MM.el('btn-golive').disabled = false;
+        MM.el('btn-endshow').disabled = true;
+      }
+    }
+
+    MM.el('btn-golive').addEventListener('click', function () {
+      sb.from('shows').update({ is_live: true, started_at: new Date().toISOString(), ended_at: null })
+        .eq('id', showId).then(refresh);
+    });
+    MM.el('btn-endshow').addEventListener('click', function () {
+      sb.from('shows').update({ is_live: false, ended_at: new Date().toISOString() })
+        .eq('id', showId).then(refresh);
+      // Mark any live segment done.
+      sb.from('segments').update({ status: 'done' }).eq('show_id', showId).eq('status', 'live').then(function () {});
+    });
+
+    /* ---- segments ---- */
+    function loadSegments() {
+      sb.from('segments').select('id,title,position,status').eq('show_id', showId).order('position')
+        .then(function (res) {
+          var wrap = MM.el('prod-segments');
+          wrap.innerHTML = '';
+          (res.data || []).forEach(function (r) {
+            var div = document.createElement('div');
+            div.className = 'seg-row';
+            var pill = r.status === 'live' ? '<span class="pill live">LIVE</span>'
+              : r.status === 'done' ? '<span class="pill done">DONE</span>'
+              : '<span class="pill">QUEUED</span>';
+            div.innerHTML = pill + '<span class="seg-title">' + MM.esc(r.title) + '</span>';
+            var up = document.createElement('button'); up.className = 'mini-btn'; up.textContent = '↑';
+            up.setAttribute('aria-label', 'Move up');
+            up.addEventListener('click', function () { moveSeg(r, -1); });
+            var dn = document.createElement('button'); dn.className = 'mini-btn'; dn.textContent = '↓';
+            dn.setAttribute('aria-label', 'Move down');
+            dn.addEventListener('click', function () { moveSeg(r, 1); });
+            var del = document.createElement('button'); del.className = 'mini-btn danger'; del.textContent = '✕';
+            del.setAttribute('aria-label', 'Delete segment');
+            del.addEventListener('click', function () {
+              sb.from('segments').delete().eq('id', r.id).then(loadSegments);
+            });
+            div.appendChild(up); div.appendChild(dn); div.appendChild(del);
+            wrap.appendChild(div);
+          });
+          if (!(res.data || []).length) {
+            wrap.innerHTML = '<p class="empty-note">No segments yet — add the rundown below.</p>';
+          }
+        });
+    }
+
+    function moveSeg(r, dir) {
+      sb.from('segments').select('id,position').eq('show_id', showId).order('position')
+        .then(function (res) {
+          var rows = res.data || [];
+          var i = -1;
+          rows.forEach(function (x, idx) { if (x.id === r.id) i = idx; });
+          var j = i + dir;
+          if (i < 0 || j < 0 || j >= rows.length) return;
+          var a = rows[i], b = rows[j];
+          sb.from('segments').update({ position: b.position }).eq('id', a.id).then(function () {
+            sb.from('segments').update({ position: a.position }).eq('id', b.id).then(loadSegments);
+          });
+        });
+    }
+
+    MM.el('seg-add').addEventListener('click', function () {
+      var v = MM.el('seg-input').value.trim().slice(0, 120);
+      if (!v || !showId) return;
+      sb.from('segments').select('position').eq('show_id', showId).order('position', { ascending: false }).limit(1)
+        .then(function (res) {
+          var pos = (res.data && res.data[0]) ? res.data[0].position + 1 : 0;
+          return sb.from('segments').insert({ show_id: showId, title: v, position: pos, status: 'pending' });
+        })
+        .then(function () { MM.el('seg-input').value = ''; loadSegments(); });
+    });
+
+    MM.el('seg-advance').addEventListener('click', function () {
+      sb.from('segments').select('id,position,status').eq('show_id', showId).order('position')
+        .then(function (res) {
+          var rows = (res.data || []).slice().sort(function (a, b) { return a.position - b.position; });
+          var liveIdx = -1;
+          rows.forEach(function (r, i) { if (r.status === 'live') liveIdx = i; });
+          var chain = Promise.resolve();
+          if (liveIdx >= 0) {
+            chain = chain.then(function () {
+              return sb.from('segments').update({ status: 'done' }).eq('id', rows[liveIdx].id);
+            });
+          }
+          var nextIdx = liveIdx + 1;
+          if (nextIdx < rows.length) {
+            chain = chain.then(function () {
+              return sb.from('segments').update({ status: 'live', started_at: new Date().toISOString() }).eq('id', rows[nextIdx].id);
+            });
+          }
+          return chain.then(loadSegments);
+        });
+    });
+
+    /* ---- questions ---- */
+    function loadQuestions() {
+      sb.from('questions').select('id,name,body,upvotes,status,created_at').eq('show_id', showId)
+        .order('upvotes', { ascending: false }).order('created_at', { ascending: true }).limit(100)
+        .then(function (res) {
+          var wrap = MM.el('prod-questions');
+          wrap.innerHTML = '';
+          var rows = res.data || [];
+          var open = rows.filter(function (r) { return r.status === 'open'; });
+          var handled = rows.filter(function (r) { return r.status !== 'open'; });
+          function rowHtml(r) {
+            var div = document.createElement('div');
+            div.className = 'q-row';
+            div.innerHTML = '<span class="q-votes">' + r.upvotes + '</span>' +
+              '<div class="q-body"><p>' + MM.esc(r.body) + '</p>' +
+              (r.name ? '<span class="q-name">— ' + MM.esc(r.name) + '</span>' : '') +
+              (r.status !== 'open' ? ' <span class="q-name">[' + MM.esc(r.status) + ']</span>' : '') + '</div>';
+            var acts = document.createElement('div');
+            acts.className = 'q-actions';
+            if (r.status === 'open') {
+              var a = document.createElement('button'); a.className = 'mini-btn'; a.textContent = 'Answered';
+              a.addEventListener('click', function () {
+                sb.from('questions').update({ status: 'answered' }).eq('id', r.id).then(loadQuestions);
+              });
+              var d = document.createElement('button'); d.className = 'mini-btn danger'; d.textContent = 'Dismiss';
+              d.addEventListener('click', function () {
+                sb.from('questions').update({ status: 'dismissed' }).eq('id', r.id).then(loadQuestions);
+              });
+              acts.appendChild(a); acts.appendChild(d);
+            }
+            div.appendChild(acts);
+            return div;
+          }
+          if (!rows.length) {
+            wrap.innerHTML = '<p class="empty-note">No questions yet.</p>';
+            return;
+          }
+          open.forEach(function (r) { wrap.appendChild(rowHtml(r)); });
+          if (handled.length) {
+            var h = document.createElement('p');
+            h.className = 'section-note'; h.style.margin = '1rem 0 0.4rem'; h.textContent = 'Handled';
+            wrap.appendChild(h);
+            handled.forEach(function (r) { wrap.appendChild(rowHtml(r)); });
+          }
+        });
+    }
+
+    /* ---- listener count (presence) ---- */
+    try {
+      var chan = sb.channel('mm-live');
+      chan.on('presence', { event: 'sync' }, function () {
+        MM.el('prod-listeners').textContent = Object.keys(chan.presenceState()).length;
+      });
+      chan.subscribe();
+    } catch (e) {}
+
+    /* ---- realtime refresh ---- */
+    try {
+      sb.channel('mm-prod')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'segments' }, loadSegments)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'questions' }, loadQuestions)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'shows' }, refresh)
+        .subscribe();
+    } catch (e) {}
+
+    refresh();
+  }
+})();
+</script>
+</body>
+</html>

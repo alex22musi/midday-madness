@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Midday Madness — Live</title>
+<meta name="description" content="Midday Madness live: countdown lobby, live WIUX 99.1 FM player, and ask-the-hosts. Every Wednesday at 1 PM ET.">
+<link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+<link rel="apple-touch-icon" href="assets/logo.jpg">
+<meta name="theme-color" content="#0a0e1c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Midday Madness">
+<meta property="og:title" content="Midday Madness — Live">
+<meta property="og:description" content="Listen to Midday Madness live on WIUX 99.1 FM, every Wednesday at 1 PM ET.">
+<meta property="og:url" content="https://alex22musi.github.io/midday-madness/live.html">
+<meta property="og:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
+<link rel="stylesheet" href="styles.css?v=20260922b">
+<link rel="stylesheet" href="live.css?v=20260923a">
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/logo.jpg" alt="Midday Madness logo">
+      <span>MIDDAY MADNESS</span>
+    </a>
+    <nav>
+      <a href="index.html#clips">Clips</a>
+      <a href="index.html#episode">Episode</a>
+      <a href="index.html">Home</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- status hero: countdown lobby / on-air / off-air -->
+  <section class="livepage-hero" id="status-section">
+    <div class="livepage-hero-inner">
+      <p class="live-kicker" id="status-kicker"><span class="live-dot" aria-hidden="true"></span><span id="status-kicker-text">STARTING SOON</span></p>
+      <h2 id="status-heading">Midday Madness starts soon</h2>
+      <p class="live-sub" id="status-sub">Counting down to 1 PM ET on WIUX 99.1 FM.</p>
+      <div class="countdown" id="countdown-wrap" aria-live="polite">
+        <span class="countdown-label" id="countdown-label">LIVE IN</span>
+        <span class="countdown-time" id="countdown-time">--:--</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- live radio player -->
+  <section class="livepage-player" id="player-section" aria-label="Live radio player">
+    <div class="player-card" id="player-card">
+      <div class="reaction-layer" id="reaction-layer" aria-hidden="true"></div>
+      <div class="player-card-top">
+        <span class="live-badge" id="live-badge" hidden><span class="live-dot" aria-hidden="true"></span>LIVE</span>
+        <span class="player-station">WIUX 99.1 FM</span>
+        <span class="player-clock" id="player-clock" hidden>00:00</span>
+      </div>
+      <div class="player-main">
+        <button class="player-play player-play-lg" id="live-toggle" aria-label="Play live radio">
+          <svg id="live-icon-play" viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="live-icon-pause" viewBox="0 0 24 24" width="34" height="34" fill="currentColor" aria-hidden="true" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          <span class="spinner" id="live-spinner" aria-hidden="true"></span>
+        </button>
+        <div class="player-info">
+          <p class="now-playing" id="now-playing">WIUX 99.1 FM</p>
+          <p class="player-status" id="player-status" role="status">Tap play to listen live.</p>
+          <p class="player-listeners" id="player-listeners" hidden><span id="listener-count">1</span> listening</p>
+        </div>
+      </div>
+      <div class="player-error" id="player-error" hidden>
+        <p id="player-error-text">WIUX seems offline right now — try again in a bit.</p>
+        <button class="retry-btn" id="player-retry">Try again</button>
+        <a class="retry-btn ios-fallback-btn" id="player-ios-fallback" href="https://www.wiux.org/page/991fm" target="_blank" rel="noopener" hidden>Listen on wiux.org</a>
+      </div>
+      <button class="tap-to-listen" id="tap-to-listen" hidden>
+        <span class="tap-text">TAP TO LISTEN LIVE</span>
+        <span class="tap-sub">Midday Madness is on the air</span>
+      </button>
+      <div class="player-tools">
+        <label class="player-volume">
+          <button class="mute-btn" id="mute-toggle" aria-label="Mute">
+            <svg id="icon-vol" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16.5 8.6a4.5 4.5 0 0 1 0 6.8l-1-1.2a2.9 2.9 0 0 0 0-4.4l1-1.2z"/></svg>
+            <svg id="icon-muted" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" style="display:none"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          </button>
+          <input type="range" id="live-vol" min="0" max="100" value="100" aria-label="Volume">
+        </label>
+        <div class="react-bar" role="group" aria-label="Send a reaction" id="react-bar"></div>
+      </div>
+      <audio id="live-audio" preload="none"></audio>
+    </div>
+    <p class="player-note">Live radio, straight from WIUX 99.1 FM Bloomington.</p>
+  </section>
+
+  <!-- ask the hosts -->
+  <section class="livepage-ask" id="ask-section" aria-label="Ask the hosts">
+    <h2>ASK THE HOSTS</h2>
+    <div id="ask-live">
+      <form id="ask-form" class="ask-form">
+        <input type="text" id="ask-name" maxlength="40" placeholder="Your name (optional)" aria-label="Your name">
+        <textarea id="ask-body" rows="2" maxlength="280" required placeholder="Ask Alex and Sam a question…" aria-label="Your question"></textarea>
+        <button type="submit" class="cta ask-submit">Send question</button>
+      </form>
+      <ol class="question-list" id="question-list"></ol>
+      <p class="empty-note" id="questions-empty" hidden>No questions yet — be the first.</p>
+    </div>
+    <div id="ask-soon" class="soon-card" hidden>
+      <p><strong>Ask-the-hosts unlocks soon.</strong></p>
+      <p>We're wiring up the live backend — question submissions and upvoting go live here once it's connected.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2026 Midday Madness &bull; WIUX 99.1 &bull; <a href="privacy.html">Privacy Policy</a> &bull; <a href="index.html">Home</a></p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="live-shared.js?v=20260923d"></script>
+<script>
+(function () {
+  'use strict';
+  var MM = window.MM;
+  // Manual override for no-show weeks (holidays, breaks): true = force live,
+  // false = force off, null = automatic. Mirrors index.html.
+  var LIVE_OVERRIDE = null;
+  var preview = new URLSearchParams(location.search).get('preview'); // ?preview=live | ?preview=soon
+  var params = new URLSearchParams(location.search);
+
+  /* ---------- show state ---------- */
+  function state() { return MM.showStateNow(preview, LIVE_OVERRIDE); }
+
+  var statusKickerText = MM.el('status-kicker-text');
+  var statusHeading = MM.el('status-heading');
+  var statusSub = MM.el('status-sub');
+  var countdownWrap = MM.el('countdown-wrap');
+  var countdownLabel = MM.el('countdown-label');
+  var countdownTime = MM.el('countdown-time');
+  var playerSection = MM.el('player-section');
+  var askSection = MM.el('ask-section');
+
+  // Countdown-only view when the show isn't live: the player and Q&A are
+  // hidden so the page is just the countdown to the next show.
+  // Audio is never stopped here — if it's already playing it keeps going.
+  function setSections(s) {
+    var live = s === 'live';
+    playerSection.hidden = !live;
+    askSection.hidden = !live;
+    document.body.classList.toggle('countdown-only', !live);
+  }
+
+  function renderStatus() {
+    var s = state();
+    document.body.classList.toggle('live-now', s === 'live');
+    document.body.classList.toggle('live-soon', s !== 'live');
+    if (s === 'live') {
+      statusKickerText.textContent = 'ON AIR NOW';
+      statusHeading.textContent = 'Midday Madness is live';
+      statusSub.textContent = 'On WIUX 99.1 FM until 2 PM ET.';
+      countdownLabel.textContent = 'ON AIR FOR';
+      countdownWrap.hidden = false;
+    } else if (s === 'soon') {
+      statusKickerText.textContent = 'STARTING SOON';
+      statusHeading.textContent = 'Midday Madness starts soon';
+      statusSub.textContent = 'Counting down to 1 PM ET on WIUX 99.1 FM.';
+      countdownLabel.textContent = 'LIVE IN';
+      countdownWrap.hidden = false;
+    } else {
+      statusKickerText.textContent = 'OFF AIR';
+      statusHeading.textContent = 'Thanks for listening';
+      statusSub.textContent = 'Midday Madness airs Wednesdays at 1 PM ET on WIUX 99.1 FM.';
+      countdownLabel.textContent = 'NEXT SHOW IN';
+      countdownWrap.hidden = false;
+    }
+  }
+
+  // Attempt to start playback programmatically — at showtime or when the
+  // page loads during show hours. Browsers may block autoplay with sound;
+  // the player then shows a tap-to-listen overlay instead of failing.
+  // Never restarts a stream the user already has playing.
+  function tryAutoplay() {
+    var p = window.MMPlayer;
+    if (MM.shouldAttemptAutoplay(p)) {
+      try { p.play(); } catch (e) {}
+    }
+  }
+  window.MM_tryAutoplay = tryAutoplay;
+
+  var lastState = state();
+
+  function tick() {
+    var s = state();
+    if (s !== lastState) {
+      lastState = s;
+      renderStatus();
+      setSections(s);
+      if (s === 'live') tryAutoplay();
+    }
+    if (s === 'live') {
+      countdownTime.textContent = MM.fmtClock(MM.msIntoShow() + 1000);
+    } else {
+      countdownTime.textContent = MM.fmtCountdown(MM.msUntilShow());
+    }
+  }
+
+  renderStatus();
+  setSections(lastState);
+  tick();
+  setInterval(tick, 1000);
+  setInterval(renderStatus, 30000); // backstop
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var MM = window.MM;
+  var params = new URLSearchParams(location.search);
+
+  /* ---------- player ---------- */
+  var audio = MM.el('live-audio');
+  var toggle = MM.el('live-toggle');
+  var iconPlay = MM.el('live-icon-play');
+  var iconPause = MM.el('live-icon-pause');
+  var spinner = MM.el('live-spinner');
+  var statusEl = MM.el('player-status');
+  var badge = MM.el('live-badge');
+  var clock = MM.el('player-clock');
+  var nowPlaying = MM.el('now-playing');
+  var errBox = MM.el('player-error');
+  var errText = MM.el('player-error-text');
+  var retryBtn = MM.el('player-retry');
+  var tapBtn = MM.el('tap-to-listen');
+  var vol = MM.el('live-vol');
+  var muteBtn = MM.el('mute-toggle');
+  var iconVol = MM.el('icon-vol');
+  var iconMuted = MM.el('icon-muted');
+  var iosFallback = MM.el('player-ios-fallback');
+
+  // Test hook: ?teststream=1 uses a known-good public stream and starts muted
+  // (muted autoplay is allowed) so the state machine can be verified headless.
+  var testStream = params.get('teststream') === '1';
+  var streamUrl = testStream ? 'https://ice1.somafm.com/groovesalad-128-mp3' : undefined;
+
+  var player = MM.createLivePlayer({
+    audio: audio,
+    streamUrl: streamUrl,
+    onState: function (st, detail) { renderPlayerState(st, detail); }
+  });
+
+  function renderPlayerState(st, detail) {
+    detail = detail || {};
+    var playing = st === 'playing';
+    var busy = st === 'connecting' || st === 'reconnecting';
+    // Both stream URLs failed with an undecodable format: explain and hand
+    // off to the WIUX site instead of a useless retry loop.
+    var unsupported = st === 'error' && detail.message === 'FORMAT_UNSUPPORTED';
+    iconPlay.style.display = playing ? 'none' : '';
+    iconPause.style.display = playing ? '' : 'none';
+    spinner.style.display = (busy || detail.buffering) && !playing ? '' : 'none';
+    if (playing && detail.buffering) spinner.style.display = '';
+    toggle.setAttribute('aria-label', playing ? 'Pause live radio' : 'Play live radio');
+    badge.hidden = !playing;
+    errBox.hidden = st !== 'error';
+    if (st === 'error') {
+      errText.textContent = unsupported
+        ? (MM.isIOS()
+          ? 'Couldn\u2019t play the live stream on this iPhone. Listen on the WIUX site instead:'
+          : 'This browser couldn\u2019t play the station\u2019s stream format. Listen on the WIUX site instead:')
+        : (detail.message || 'WIUX seems offline right now — try again in a bit.');
+    }
+    retryBtn.hidden = unsupported;
+    iosFallback.hidden = !unsupported;
+    // Autoplay was blocked: show the big tap-to-listen overlay over the card.
+    tapBtn.hidden = st !== 'awaiting-tap';
+
+    if (st === 'idle') statusEl.textContent = 'Tap play to listen live.';
+    else if (st === 'awaiting-tap') statusEl.textContent = 'Tap to start listening live.';
+    else if (st === 'connecting') statusEl.textContent = 'Connecting…';
+    else if (st === 'reconnecting') statusEl.textContent = 'Reconnecting… (attempt ' + detail.attempt + ')';
+    else if (st === 'playing') statusEl.textContent = detail.buffering ? 'Buffering…' : 'You’re listening live.';
+    else if (st === 'paused') statusEl.textContent = 'Paused. Tap play to jump back in.';
+    else if (st === 'setup') statusEl.textContent = detail.message || 'Stream not configured yet.';
+    else if (st === 'error') statusEl.textContent = unsupported
+      ? (MM.isIOS() ? 'iPhone playback isn\u2019t supported for this stream.' : 'This browser can\u2019t play the stream format.')
+      : 'Tap “Try again” when you’re ready.';
+
+    // now-playing readout: never an empty field
+    var s = MM.showStateNow(new URLSearchParams(location.search).get('preview'), null);
+    nowPlaying.textContent = (s === 'live' || playing) ? 'Midday Madness — live' : 'WIUX 99.1 FM';
+  }
+
+  toggle.addEventListener('click', function () { player.toggle(); });
+  retryBtn.addEventListener('click', function () { player.retry(); });
+  tapBtn.addEventListener('click', function () { player.play(); }); // real tap: allowed to play with sound
+
+  // volume / mute (persisted)
+  var restored = player.restoreVolume();
+  vol.value = Math.round(restored.volume * 100);
+  function syncMuteIcon() {
+    var m = audio.muted || audio.volume === 0;
+    iconVol.style.display = m ? 'none' : '';
+    iconMuted.style.display = m ? '' : 'none';
+    muteBtn.setAttribute('aria-label', m ? 'Unmute' : 'Mute');
+  }
+  vol.addEventListener('input', function () {
+    var v = vol.value / 100;
+    player.applyVolume(v, v === 0); // dragging to 0 mutes; dragging up unmutes
+    restored = { volume: audio.volume, muted: audio.muted };
+    syncMuteIcon();
+  });
+  muteBtn.addEventListener('click', function () {
+    player.applyVolume(audio.volume, !audio.muted);
+    restored = { volume: audio.volume, muted: audio.muted };
+    if (!audio.muted && audio.volume === 0) { player.applyVolume(0.8, false); vol.value = 80; }
+    restored = { volume: audio.volume, muted: audio.muted };
+    syncMuteIcon();
+  });
+  syncMuteIcon();
+
+  // iOS ignores programmatic volume on <audio>: hide the slider there and
+  // point at the hardware buttons. Mute still works.
+  if (MM.isIOS()) {
+    vol.style.display = 'none';
+    var volHint = document.createElement('span');
+    volHint.className = 'vol-hint';
+    volHint.textContent = 'Use your iPhone\u2019s volume buttons';
+    vol.parentNode.insertBefore(volHint, vol.nextSibling);
+  }
+
+  // elapsed show clock while live
+  setInterval(function () {
+    var s = MM.showStateNow(new URLSearchParams(location.search).get('preview'), null);
+    if (s === 'live' && player.getState() === 'playing') {
+      clock.hidden = false;
+      clock.textContent = MM.fmtClock(MM.msIntoShow());
+    } else {
+      clock.hidden = true;
+    }
+  }, 1000);
+
+  if (testStream) {
+    try { audio.muted = true; } catch (e) {}
+    player.play();
+  }
+
+  // Expose the player so the countdown script can attempt autoplay at
+  // showtime. If the page loaded during show hours, try immediately.
+  window.MMPlayer = player;
+  if (typeof window.MM_tryAutoplay === 'function' &&
+      MM.showStateNow(new URLSearchParams(location.search).get('preview'), null) === 'live') {
+    window.MM_tryAutoplay();
+  }
+
+  /* ---------- reactions (ephemeral) ---------- */
+  var reactBar = MM.el('react-bar');
+  var reactionLayer = MM.el('reaction-layer');
+  var sb = MM.supabaseClient();
+
+  function burst(emoji, xPct) {
+    var s = document.createElement('span');
+    s.className = 'react-burst';
+    s.textContent = emoji;
+    s.style.left = (xPct == null ? 20 + Math.random() * 60 : xPct) + '%';
+    reactionLayer.appendChild(s);
+    setTimeout(function () { s.remove(); }, 1600);
+  }
+
+  MM.REACTION_EMOJI.forEach(function (e) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'react-btn';
+    b.textContent = e;
+    b.setAttribute('aria-label', 'Send ' + e + ' reaction');
+    b.addEventListener('click', function (ev) {
+      var r = reactBar.getBoundingClientRect();
+      var xPct = r.width ? ((ev.clientX - r.left) / r.width) * 100 : null;
+      burst(e, xPct);
+      if (sb) {
+        try { sb.channel('mm-reactions').send({ type: 'broadcast', event: 'react', payload: { emoji: e } }); } catch (err) {}
+      }
+    });
+    reactBar.appendChild(b);
+  });
+
+  if (sb) {
+    try {
+      sb.channel('mm-reactions')
+        .on('broadcast', { event: 'react' }, function (msg) {
+          if (msg && msg.payload && msg.payload.emoji) burst(msg.payload.emoji);
+        })
+        .subscribe();
+    } catch (e) {}
+  }
+
+  /* ---------- listener count (presence) ---------- */
+  var listenersEl = MM.el('player-listeners');
+  var listenerCount = MM.el('listener-count');
+  if (sb) {
+    try {
+      var chan = sb.channel('mm-live', { config: { presence: { key: 'l-' + Math.random().toString(36).slice(2) } } });
+      chan.on('presence', { event: 'sync' }, function () {
+        var n = Object.keys(chan.presenceState()).length;
+        if (n > 0) { listenersEl.hidden = false; listenerCount.textContent = n; }
+      });
+      chan.subscribe(function (status) {
+        if (status === 'SUBSCRIBED') chan.track({ online_at: new Date().toISOString() });
+      });
+    } catch (e) {}
+  }
+
+  /* ---------- ask-the-hosts ---------- */
+  initAskHosts(sb);
+
+  function initAskHosts(sb) {
+    var askLive = MM.el('ask-live');
+    var askSoon = MM.el('ask-soon');
+
+    if (!sb) {
+      askLive.hidden = true;
+      askSoon.hidden = false;
+      return;
+    }
+    askLive.hidden = false;
+    askSoon.hidden = true;
+    bootQuestions(sb);
+  }
+
+  function bootQuestions(sb) {
+    var showId = null;
+    sb.from('shows').upsert({ show_date: MM.todayKey() }, { onConflict: 'show_date' })
+      .select('id,is_live').single()
+      .then(function (res) {
+        if (res.error || !res.data) throw res.error || new Error('no show row');
+        showId = res.data.id;
+        loadQuestions();
+        sb.channel('mm-questions')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'questions', filter: 'show_id=eq.' + showId }, loadQuestions)
+          .subscribe();
+      })
+      .catch(function () { /* questions stay quiet until the backend is reachable */ });
+
+    var voted = {};
+    try { voted = JSON.parse(localStorage.getItem('mm_voted') || '{}'); } catch (e) {}
+
+    MM.el('ask-form').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var name = MM.el('ask-name').value.trim().slice(0, 40);
+      var body = MM.el('ask-body').value.trim().slice(0, 280);
+      if (!body || !showId) return;
+      sb.from('questions').insert({ show_id: showId, name: name || null, body: body })
+        .then(function (res) {
+          if (!res.error) { MM.el('ask-body').value = ''; }
+        });
+    });
+
+    function loadQuestions() {
+      sb.from('questions').select('id,name,body,upvotes,created_at').eq('show_id', showId).eq('status', 'open')
+        .order('upvotes', { ascending: false }).order('created_at', { ascending: true }).limit(50)
+        .then(function (res) {
+          var list = MM.el('question-list');
+          var empty = MM.el('questions-empty');
+          list.innerHTML = '';
+          var rows = (res.data || []);
+          empty.hidden = rows.length > 0;
+          rows.forEach(function (q) {
+            var li = document.createElement('li');
+            li.className = 'question';
+            var has = !!voted[q.id];
+            li.innerHTML =
+              '<button type="button" class="upvote' + (has ? ' voted' : '') + '" data-qid="' + MM.esc(q.id) + '" aria-label="Upvote this question">' +
+              '<span class="upvote-arrow" aria-hidden="true">▲</span><span class="upvote-count">' + q.upvotes + '</span></button>' +
+              '<div class="question-body"><p>' + MM.esc(q.body) + '</p>' +
+              (q.name ? '<span class="question-name">— ' + MM.esc(q.name) + '</span>' : '') + '</div>';
+            list.appendChild(li);
+          });
+          list.querySelectorAll('.upvote').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              var qid = btn.getAttribute('data-qid');
+              if (voted[qid]) return;
+              var countEl = btn.querySelector('.upvote-count');
+              var n = parseInt(countEl.textContent, 10) || 0;
+              sb.from('questions').update({ upvotes: n + 1 }).eq('id', qid).then(function () {
+                voted[qid] = 1;
+                try { localStorage.setItem('mm_voted', JSON.stringify(voted)); } catch (e) {}
+              });
+            });
+          });
+        });
+    }
+  }
+})();
+</script>
+</body>
+</html>
