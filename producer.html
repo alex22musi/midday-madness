@@ -9,7 +9,7 @@
 <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
 <meta name="theme-color" content="#0a0e1c">
 <link rel="stylesheet" href="styles.css?v=20261110a">
-<link rel="stylesheet" href="live.css?v=20261110a">
+<link rel="stylesheet" href="live.css?v=20261110b">
 </head>
 <body>
 <header class="nav">
@@ -57,18 +57,21 @@
 
   <!-- console -->
   <div class="producer-grid" id="console" hidden>
-    <div class="panel">
+    <div class="panel wide">
       <h2>SHOW CONTROL</h2>
-      <p class="show-state-line" id="show-state-line">Loading…</p>
-      <div class="row">
-        <button class="btn go" id="btn-golive">Go Live</button>
-        <button class="btn stop" id="btn-endshow">End Show</button>
+      <div class="control-row">
+        <div class="control-main">
+          <p class="show-state-line" id="show-state-line">Loading…</p>
+          <div class="row">
+            <button class="btn go" id="btn-golive">Go Live</button>
+            <button class="btn stop" id="btn-endshow">End Show</button>
+          </div>
+        </div>
+        <div class="control-listeners">
+          <span class="listener-big" id="prod-listeners">—</span>
+          <span class="listeners-label">listening now</span>
+        </div>
       </div>
-    </div>
-    <div class="panel">
-      <h2>LISTENERS</h2>
-      <p class="listener-big" id="prod-listeners">—</p>
-      <p class="show-state-line">connected right now</p>
     </div>
     <div class="panel wide">
       <h2>SEGMENTS</h2>
