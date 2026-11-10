@@ -256,8 +256,11 @@ img.host-photo {
 
 /* ---------- live mode ---------- */
 [hidden] { display: none !important; }
-/* When live mode is on, the sticky nav sits below the sticky live banner. */
-body.live-now .nav, body.live-soon .nav { top: var(--live-banner-h, 64px); }
+/* When live mode is on, the sticky nav sits below the sticky live banner.
+   Scoped to pages that actually have the banner (body.has-banner, i.e. the
+   homepage) — on live.html/producer.html there is no banner, and this offset
+   left a 64px gap where hero content clipped above the nav. */
+body.has-banner.live-now .nav, body.has-banner.live-soon .nav { top: var(--live-banner-h, 64px); }
 
 .live-banner {
   position: sticky; top: 0; z-index: 200;

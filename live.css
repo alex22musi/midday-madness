@@ -2,6 +2,11 @@
 
 [hidden] { display: none !important; }
 
+/* live.html / producer.html have no live banner above the nav — the sticky
+   nav must sit flush at the top (the banner offset lives in styles.css and
+   is scoped to body.has-banner; this is a belt-and-suspenders override). */
+body.live-now .nav, body.live-soon .nav { top: 0; }
+
 /* countdown-only view (show not live): the hero is the whole page */
 body.countdown-only .livepage-hero {
   min-height: 78vh;

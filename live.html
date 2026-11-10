@@ -14,8 +14,8 @@
 <meta property="og:description" content="Listen to Midday Madness live on WIUX 99.1 FM, every Wednesday at 1 PM ET.">
 <meta property="og:url" content="https://alex22musi.github.io/midday-madness/live.html">
 <meta property="og:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20260922b">
-<link rel="stylesheet" href="live.css?v=20260923a">
+<link rel="stylesheet" href="styles.css?v=20261110a">
+<link rel="stylesheet" href="live.css?v=20261110a">
 </head>
 <body>
 <header class="nav">
@@ -125,6 +125,22 @@
   var preview = new URLSearchParams(location.search).get('preview'); // ?preview=live | ?preview=soon
   var params = new URLSearchParams(location.search);
 
+  // Elapsed show time. During real show hours this is time since 1 PM ET.
+  // In ?preview=live (off-hours testing) there is no real show start, so
+  // anchor to when the preview session began — otherwise the clock sits
+  // frozen at 00:01 and looks broken.
+  var previewLiveStart = null;
+  function elapsedMs() {
+    var real = MM.msIntoShow();
+    if (real > 0) return real;
+    if (preview === 'live') {
+      if (!previewLiveStart) previewLiveStart = Date.now();
+      return Date.now() - previewLiveStart;
+    }
+    return 0;
+  }
+  window.MM_elapsedMs = elapsedMs;
+
   /* ---------- show state ---------- */
   function state() { return MM.showStateNow(preview, LIVE_OVERRIDE); }
 
@@ -195,7 +211,7 @@
       if (s === 'live') tryAutoplay();
     }
     if (s === 'live') {
-      countdownTime.textContent = MM.fmtClock(MM.msIntoShow() + 1000);
+      countdownTime.textContent = MM.fmtClock(elapsedMs());
     } else {
       countdownTime.textContent = MM.fmtCountdown(MM.msUntilShow());
     }
@@ -330,7 +346,7 @@
     var s = MM.showStateNow(new URLSearchParams(location.search).get('preview'), null);
     if (s === 'live' && player.getState() === 'playing') {
       clock.hidden = false;
-      clock.textContent = MM.fmtClock(MM.msIntoShow());
+      clock.textContent = MM.fmtClock(window.MM_elapsedMs ? window.MM_elapsedMs() : MM.msIntoShow());
     } else {
       clock.hidden = true;
     }
