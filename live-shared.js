@@ -71,10 +71,10 @@
     return out;
   }
 
-  // { weekday: 'Wed', minutes: <mins since midnight ET> }
+  // { weekday: 'Wed', minutes: <mins since midnight ET>, seconds: <sec into the minute ET> }
   function showParts(d) {
-    var p = etParts(d, { weekday: 'short', hour: 'numeric', minute: 'numeric' });
-    return { weekday: p.weekday, minutes: parseInt(p.hour, 10) * 60 + parseInt(p.minute, 10) };
+    var p = etParts(d, { weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric' });
+    return { weekday: p.weekday, minutes: parseInt(p.hour, 10) * 60 + parseInt(p.minute, 10), seconds: parseInt(p.second, 10) || 0 };
   }
 
   // 'live' | 'soon' | 'off'
@@ -116,7 +116,7 @@
     var t = showParts(new Date());
     if (t.weekday !== CONFIG.SHOW_WEEKDAY) return 0;
     if (t.minutes < CONFIG.SHOW_START_MIN || t.minutes >= CONFIG.SHOW_END_MIN) return 0;
-    return (t.minutes - CONFIG.SHOW_START_MIN) * 60000;
+    return (t.minutes - CONFIG.SHOW_START_MIN) * 60000 + (t.seconds || 0) * 1000;
   }
 
   // 'YYYY-MM-DD' for today in show timezone (used as the shows.show_date key)
