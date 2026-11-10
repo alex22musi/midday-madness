@@ -1,0 +1,68 @@
+[
+  {
+    "date": "2026-09-16",
+    "label": "Sep 16, 2026",
+    "title": null,
+    "description": null,
+    "durationSec": 3219,
+    "audioFile": "assets/episodes/ep-2026-09-16.m4a",
+    "clips": [
+      "clip-2026-09-16-texas-am-is-overrated",
+      "clip-2026-09-16-josh-allen-is-a-monster",
+      "clip-2026-09-16-chiefs-destroyed-the-broncos"
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "label": "Sep 23, 2026",
+    "title": null,
+    "description": null,
+    "durationSec": 3401,
+    "audioFile": "assets/episodes/ep-2026-09-23.m4a",
+    "clips": [
+      "clip-2026-09-23-best-qb-in-college-football",
+      "clip-2026-09-23-marcel-reed-is-bad",
+      "clip-2026-09-23-taking-maiava-over-moore"
+    ]
+  },
+  {
+    "date": "2026-10-07",
+    "label": "Oct 7, 2026",
+    "title": null,
+    "description": null,
+    "durationSec": null,
+    "audioFile": null,
+    "clips": []
+  },
+  {
+    "date": "2026-10-21",
+    "label": "Oct 21, 2026",
+    "title": null,
+    "description": null,
+    "durationSec": null,
+    "audioFile": null,
+    "clips": []
+  },
+  {
+    "date": "2026-10-28",
+    "label": "Oct 28, 2026",
+    "title": null,
+    "description": null,
+    "durationSec": null,
+    "audioFile": null,
+    "clips": []
+  },
+  {
+    "date": "2026-11-04",
+    "label": "Nov 4, 2026",
+    "title": null,
+    "description": null,
+    "durationSec": 3338,
+    "audioFile": "assets/episodes/ep-2026-11-04.m4a",
+    "clips": [
+      "clip-2026-11-04-hoover-short-rope",
+      "clip-2026-11-04-take-the-couch-saturday",
+      "clip-2026-11-04-dont-spend-sell-the-team"
+    ]
+  }
+]
