@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110a">
+<link rel="stylesheet" href="styles.css?v=20261110b">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -67,46 +67,26 @@
 
   <section id="clips" class="clips">
     <h2>LATEST CLIPS</h2>
-    <div class="clip-grid">
-      <article class="clip-card">
-        <video controls playsinline preload="metadata" poster="assets/poster1.jpg" src="assets/clip1.mp4"></video>
-        <div class="clip-body">
-          <h3>Hoover on a Short Rope?</h3>
-          <p class="meta">0:55</p>
-          <p>The Bloomington QB debate: Grant Wilson looked better than Josh Hoover off the bench (9-of-17 vs. Minnesota) &mdash; but if Hoover has actually been hurt, he starts against USC on a very short rope.</p>
-        </div>
-      </article>
-      <article class="clip-card">
-        <video controls playsinline preload="metadata" poster="assets/poster2.jpg" src="assets/clip2.mp4"></video>
-        <div class="clip-body">
-          <h3>Take the Couch Saturday</h3>
-          <p class="meta">0:44</p>
-          <p>Probably the biggest college football slate they&rsquo;ve ever seen &mdash; drop everything, tell the wife it&rsquo;s your day, and take the couch from noon to midnight.</p>
-        </div>
-      </article>
-      <article class="clip-card">
-        <video controls playsinline preload="metadata" poster="assets/poster3.jpg" src="assets/clip3.mp4"></video>
-        <div class="clip-body">
-          <h3>Don&rsquo;t Spend? Sell the Team</h3>
-          <p class="meta">0:42</p>
-          <p>MLB lockout talk: the Dodgers and Mets spend infinite money while small markets can&rsquo;t compete &mdash; if you don&rsquo;t want to spend, sell the team. A floor is a must, and some form of a cap is coming.</p>
-        </div>
-      </article>
-    </div>
+    <div class="clip-grid" id="clip-grid"></div>
+    <p class="clips-empty" id="clips-empty" hidden>Clips are on their way &mdash; check back after Wednesday&rsquo;s show.</p>
+    <button type="button" class="show-more" id="clips-more" hidden>Show more clips</button>
   </section>
 
   <section id="episode" class="episode">
     <h2>FULL EPISODE</h2>
-    <p class="episode-title">November 4, 2026 &mdash; the full episode</p>
+    <p class="episode-title" id="episode-heading">November 4, 2026 &mdash; the full episode</p>
     <div class="player" id="player">
       <audio id="player-audio" preload="metadata" src="assets/full-show.m4a"></audio>
       <div class="player-head">
         <img class="player-art" src="assets/logo.jpg" alt="Midday Madness logo">
         <div class="player-meta">
-          <span class="player-kicker">Latest episode</span>
-          <span class="player-title">November 4, 2026 &mdash; the full episode</span>
+          <span class="player-kicker" id="player-kicker">Latest episode</span>
+          <span class="player-title" id="player-title">November 4, 2026 &mdash; the full episode</span>
         </div>
       </div>
+      <label class="episode-picker">Episode
+        <select id="episode-select" aria-label="Choose an episode"></select>
+      </label>
       <div class="player-scrub">
         <span class="player-time" id="player-current">0:00</span>
         <div class="player-bar" id="player-bar" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
@@ -385,6 +365,111 @@
     });
   });
   if (vol) vol.addEventListener('input', function () { audio.volume = vol.value / 100; });
+})();
+</script>
+<script>
+/* ---------- Phase 1: data-driven clips grid + jump-to-moment ---------- */
+(function () {
+  var PAGE = 6;
+  var grid = document.getElementById('clip-grid');
+  var moreBtn = document.getElementById('clips-more');
+  var emptyMsg = document.getElementById('clips-empty');
+  var audio = document.getElementById('player-audio');
+  var select = document.getElementById('episode-select');
+  var heading = document.getElementById('episode-heading');
+  var pTitle = document.getElementById('player-title');
+  var pKicker = document.getElementById('player-kicker');
+  var clips = [], episodes = {}, shown = 0, currentEp = null;
+
+  function fmtDur(s) { var m = Math.floor(s / 60), ss = s % 60; return m + ':' + (ss < 10 ? '0' : '') + ss; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function loadEpisode(date, seekSec, autoplay) {
+    var ep = episodes[date];
+    if (!ep || !ep.audioFile) return false;
+    var isCurrent = currentEp === date && audio.src.indexOf(ep.audioFile) !== -1;
+    function go() {
+      if (typeof seekSec === 'number') { try { audio.currentTime = seekSec; } catch (e) {} }
+      if (autoplay) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
+    }
+    currentEp = date;
+    if (select) select.value = date;
+    var label = ep.label + ' \u2014 the full episode';
+    if (heading) heading.textContent = label;
+    if (pTitle) pTitle.textContent = label;
+    if (pKicker) pKicker.textContent = (seekSec != null) ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
+    if (isCurrent) { go(); }
+    else {
+      audio.src = ep.audioFile;
+      if (audio.readyState >= 1) go();
+      else audio.addEventListener('loadedmetadata', function h() { audio.removeEventListener('loadedmetadata', h); go(); });
+    }
+    return true;
+  }
+  window.MM_loadEpisode = loadEpisode;
+
+  function card(clip) {
+    var art = document.createElement('article');
+    art.className = 'clip-card';
+    art.innerHTML =
+      '<video controls playsinline preload="metadata" poster="' + esc(clip.poster) + '" src="' + esc(clip.file) + '"></video>' +
+      '<div class="clip-body"><h3>' + esc(clip.title) + '</h3>' +
+      '<p class="meta">' + esc(clip.episodeLabel) + ' &bull; ' + fmtDur(clip.durationSec) + '</p>' +
+      '<p>' + esc(clip.blurb || '') + '</p>' +
+      '<button type="button" class="ts-chip" data-ep="' + esc(clip.episodeDate) + '" data-t="' + clip.startSec + '"' +
+      ' aria-label="Play the ' + esc(clip.episodeLabel) + ' episode at ' + esc(clip.timestampLabel) + '">\u25B6 at ' + esc(clip.timestampLabel) + ' in the episode</button></div>';
+    return art;
+  }
+  function renderMore() {
+    var frag = document.createDocumentFragment();
+    var next = Math.min(shown + PAGE, clips.length);
+    for (var i = shown; i < next; i++) frag.appendChild(card(clips[i]));
+    shown = next;
+    grid.appendChild(frag);
+    moreBtn.hidden = shown >= clips.length;
+  }
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('.ts-chip') : null;
+    if (!btn) return;
+    var t = parseInt(btn.getAttribute('data-t'), 10);
+    if (loadEpisode(btn.getAttribute('data-ep'), t, true)) {
+      document.getElementById('episode').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var url = new URL(location.href);
+      url.searchParams.set('ep', btn.getAttribute('data-ep'));
+      url.searchParams.set('t', t);
+      history.replaceState(null, '', url);
+    }
+  });
+  moreBtn.addEventListener('click', renderMore);
+  if (select) select.addEventListener('change', function () { loadEpisode(select.value, 0, false); });
+
+  function init(clipsData, epsData) {
+    clips = clipsData.slice().sort(function (a, b) { return b.episodeDate.localeCompare(a.episodeDate) || a.startSec - b.startSec; });
+    epsData.forEach(function (ep) { episodes[ep.date] = ep; });
+    if (select) {
+      epsData.filter(function (ep) { return ep.audioFile; })
+        .sort(function (a, b) { return b.date.localeCompare(a.date); })
+        .forEach(function (ep) {
+          var o = document.createElement('option');
+          o.value = ep.date; o.textContent = ep.label;
+          select.appendChild(o);
+        });
+    }
+    if (!clips.length) { emptyMsg.hidden = false; return; }
+    renderMore();
+    var q = new URLSearchParams(location.search);
+    var ep = q.get('ep'), t = parseInt(q.get('t'), 10);
+    if (ep && episodes[ep]) loadEpisode(ep, isNaN(t) ? 0 : t, false);
+    else {
+      var latest = epsData.filter(function (e2) { return e2.audioFile; }).sort(function (a, b) { return b.date.localeCompare(a.date); })[0];
+      if (latest) { currentEp = latest.date; if (select) select.value = latest.date; }
+    }
+  }
+  Promise.all([
+    fetch('data/clips.json').then(function (r) { return r.json(); }),
+    fetch('data/episodes.json').then(function (r) { return r.json(); })
+  ]).then(function (res) { init(res[0], res[1]); })
+    .catch(function () { emptyMsg.hidden = false; });
 })();
 </script>
 </body>
