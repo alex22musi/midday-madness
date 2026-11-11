@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110i">
+<link rel="stylesheet" href="styles.css?v=20261110j">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -128,6 +128,7 @@
         </label>
       </div>
     </div>
+    <div class="ep-archive" id="ep-archive"></div>
   </section>
 
   <section id="about" class="about">
@@ -410,6 +411,12 @@ document.addEventListener('play', function (e) {
         r.classList.toggle('now', r.getAttribute('data-date') === ep.date);
       });
     }
+    var arch = document.getElementById('ep-archive');
+    if (arch) {
+      arch.querySelectorAll('.arch-row').forEach(function (r) {
+        r.classList.toggle('now', r.getAttribute('data-date') === ep.date);
+      });
+    }
   }
   function buildSheet() {
     if (!sheet) return;
@@ -441,6 +448,60 @@ document.addEventListener('play', function (e) {
         toggleSheet(false);
         var p = document.getElementById('player');
         if (p && p.scrollIntoView) p.scrollIntoView({ block: 'nearest' });
+      });
+    });
+    syncPicker();
+  }
+  function buildArchive() {
+    var arch = document.getElementById('ep-archive');
+    if (!arch || !epList.length) return;
+    var clipById = {};
+    clips.forEach(function (c) { clipById[c.id] = c; });
+    var groups = {}, order = [];
+    epList.forEach(function (ep, i) {
+      var g = seasonOf(ep.date);
+      if (!groups[g]) { groups[g] = []; order.push(g); }
+      groups[g].push({ ep: ep, n: i + 1 });
+    });
+    order.reverse();
+    var html = '';
+    order.forEach(function (g) {
+      html += '<h3 class="arch-season">' + esc(g) + '</h3>';
+      groups[g].slice().reverse().forEach(function (it) {
+        var ep = it.ep;
+        var d = new Date(ep.date + 'T12:00:00');
+        var wd = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d.getDay()];
+        html += '<article class="arch-row" data-date="' + ep.date + '">' +
+          '<div class="arch-tile" aria-hidden="true"><span>EP</span><strong>' + it.n + '</strong></div>' +
+          '<div class="arch-main"><h4>' + esc(ep.title || ep.label) + '</h4>' +
+          '<p class="arch-meta">' + wd + ', ' + esc(ep.label) + ' \u00B7 ' + fmtDur(ep.durationSec || 0) + '</p>' +
+          (ep.description ? '<p class="arch-desc">' + esc(ep.description) + '</p>' : '');
+        if (ep.clips && ep.clips.length) {
+          html += '<div class="arch-clips">';
+          ep.clips.forEach(function (cid) {
+            var c = clipById[cid];
+            if (c) html += '<button type="button" class="arch-chip" data-ep="' + ep.date + '" data-t="' + c.startSec + '">\u25B6 ' + esc(c.title) + ' \u00B7 ' + esc(c.timestampLabel) + '</button>';
+          });
+          html += '</div>';
+        }
+        html += '</div>' +
+          '<button type="button" class="arch-play" data-date="' + ep.date + '" aria-label="Play ' + esc(ep.title || ep.label) + '">\u25B6 Play</button>' +
+          '</article>';
+      });
+    });
+    arch.innerHTML = html;
+    arch.querySelectorAll('.arch-play').forEach(function (b) {
+      b.addEventListener('click', function () {
+        loadEpisode(b.getAttribute('data-date'), null, true);
+        var p = document.getElementById('player');
+        if (p && p.scrollIntoView) p.scrollIntoView({ block: 'start' });
+      });
+    });
+    arch.querySelectorAll('.arch-chip').forEach(function (b) {
+      b.addEventListener('click', function () {
+        loadEpisode(b.getAttribute('data-ep'), parseInt(b.getAttribute('data-t'), 10) || 0, true);
+        var p = document.getElementById('player');
+        if (p && p.scrollIntoView) p.scrollIntoView({ block: 'start' });
       });
     });
     syncPicker();
@@ -614,6 +675,7 @@ document.addEventListener('play', function (e) {
     if (!clips.length) { emptyMsg.hidden = false; return; }
     renderMore();
     buildSheet();
+    buildArchive();
     var q = new URLSearchParams(location.search);
     var ep = q.get('ep'), t = parseInt(q.get('t'), 10);
     if (ep && episodes[ep]) loadEpisode(ep, isNaN(t) ? 0 : t, false);

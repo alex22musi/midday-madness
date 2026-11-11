@@ -482,3 +482,46 @@ footer {
 }
 .cv-seek::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #fff; border: none; box-shadow: 0 1px 5px rgba(0,0,0,.5); }
 .cv-seek::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,.25); }
+
+/* Phase 2 archive: season-grouped episode rows under the player */
+.ep-archive { margin-top: 1.4rem; }
+.arch-season {
+  margin: 1.3rem 0 0.2rem; font-size: 0.68rem; letter-spacing: 0.16em; font-weight: 800;
+  color: var(--gold); text-transform: uppercase;
+}
+.arch-season:first-child { margin-top: 0.4rem; }
+.arch-row {
+  display: flex; gap: 0.85rem; align-items: flex-start;
+  padding: 0.9rem 0.2rem; border-top: 1px solid rgba(255,255,255,0.07);
+}
+.arch-row.now { background: rgba(245, 179, 1, 0.05); border-radius: 10px; padding-left: 0.6rem; padding-right: 0.6rem; }
+.arch-tile {
+  flex: 0 0 auto; width: 52px; height: 52px; border-radius: 10px;
+  background: linear-gradient(160deg, #1d2749, #10162c); border: 1px solid rgba(245,179,1,0.35);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1;
+}
+.arch-tile span { font-size: 0.52rem; letter-spacing: 0.18em; font-weight: 800; color: var(--gold); }
+.arch-tile strong { font-size: 1.15rem; font-weight: 900; color: #fff; margin-top: 0.14rem; }
+.arch-row.now .arch-tile { background: var(--gold); border-color: var(--gold); }
+.arch-row.now .arch-tile span { color: #131313; }
+.arch-row.now .arch-tile strong { color: #131313; }
+.arch-main { flex: 1 1 auto; min-width: 0; }
+.arch-main h4 { margin: 0.05rem 0 0.2rem; font-size: 0.98rem; font-weight: 800; }
+.arch-meta { margin: 0; font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+.arch-desc { margin: 0.35rem 0 0; font-size: 0.82rem; color: #c6cbda; line-height: 1.45; }
+.arch-clips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.55rem; }
+.arch-chip {
+  border: 1px solid rgba(245,179,1,0.4); background: rgba(245,179,1,0.07); color: var(--gold-soft, #ffd34d);
+  font-size: 0.7rem; font-weight: 700; border-radius: 999px; padding: 0.32rem 0.6rem; cursor: pointer;
+}
+.arch-chip:hover { background: rgba(245,179,1,0.16); }
+.arch-play {
+  flex: 0 0 auto; border: none; cursor: pointer; border-radius: 999px;
+  background: var(--gold); color: #131313; font-weight: 800; font-size: 0.78rem;
+  padding: 0.55rem 0.95rem; margin-top: 0.15rem;
+}
+.arch-play:hover { filter: brightness(1.07); }
+@media (max-width: 560px) {
+  .arch-row { flex-wrap: wrap; }
+  .arch-play { margin-left: 64px; }
+}
