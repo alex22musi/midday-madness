@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110e">
+<link rel="stylesheet" href="styles.css?v=20261110f">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -37,7 +37,7 @@
     </a>
     <nav>
       <a href="#clips">Clips</a>
-      <a href="#episode">Episode</a>
+      <a href="#episode">Episodes</a>
       <a href="#about">About</a>
       <a href="#listen">Listen</a>
     </nav>
@@ -72,8 +72,7 @@
   </section>
 
   <section id="episode" class="episode">
-    <h2>FULL EPISODE</h2>
-    <p class="episode-title" id="episode-heading">November 4, 2026 &mdash; the full episode</p>
+    <h2>FULL EPISODES</h2>
     <div class="player" id="player">
       <audio id="player-audio" preload="metadata" src="assets/episodes/ep-2026-11-04.m4a"></audio>
       <div class="player-head">
@@ -388,7 +387,6 @@ document.addEventListener('play', function (e) {
   var moreBtn = document.getElementById('clips-more');
   var emptyMsg = document.getElementById('clips-empty');
   var audio = document.getElementById('player-audio');
-  var heading = document.getElementById('episode-heading');
   var pTitle = document.getElementById('player-title');
   var pKicker = document.getElementById('player-kicker');
   var clips = [], episodes = {}, shown = 0, currentEp = null;
@@ -424,7 +422,6 @@ document.addEventListener('play', function (e) {
     epIdx = epList.findIndex(function (e) { return e.date === date; });
     syncStepper();
     var label = ep.label + ' \u2014 the full episode';
-    if (heading) heading.textContent = label;
     if (pTitle) pTitle.textContent = label;
     if (pKicker) pKicker.textContent = (typeof seekSec === 'number') ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
     if (isCurrent) { go(); }

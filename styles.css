@@ -159,8 +159,17 @@ img.host-photo {
 }
 
 /* ---------- full episode ---------- */
-.episode { text-align: center; }
-.episode-title { color: var(--text); font-weight: 600; margin-bottom: 1.2rem; }
+/* Full-episodes band: full-bleed darker chapter break so leaving the
+   clips grid feels like entering a different room — the episode player. */
+.episode {
+  text-align: center;
+  max-width: none;
+  padding-left: max(1.2rem, calc(50% - 550px));
+  padding-right: max(1.2rem, calc(50% - 550px));
+  background: linear-gradient(180deg, #131a33 0%, #0a0e1e 100%);
+  border-top: 2px solid rgba(227, 168, 60, 0.5);
+  border-bottom: 1px solid rgba(227, 168, 60, 0.2);
+}
 .episode audio { width: 100%; max-width: 640px; }
 
 .player {

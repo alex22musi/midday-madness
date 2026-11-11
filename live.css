@@ -231,6 +231,9 @@ body.live-now .livepage-hero {
   box-shadow: 0 0 0 3px rgba(227, 168, 60, 0.2);
 }
 .ask-submit { align-self: flex-start; border: none; cursor: pointer; font-size: 0.95rem; padding: 0.7rem 1.8rem; }
+.ask-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.ask-note { margin: -0.9rem 0 1.4rem; font-size: 0.85rem; color: var(--gold-soft); }
+.ask-note.error { color: #ff9a9e; }
 .question-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
 .question {
   display: flex; gap: 0.9rem; align-items: flex-start;

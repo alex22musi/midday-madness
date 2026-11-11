@@ -289,11 +289,11 @@
             if (r.status === 'open') {
               var a = document.createElement('button'); a.className = 'mini-btn'; a.textContent = 'Answered';
               a.addEventListener('click', function () {
-                sb.from('questions').update({ status: 'answered' }).eq('id', r.id).then(loadQuestions);
+                sb.rpc('set_question_status', { p_question_id: r.id, p_status: 'answered' }).then(loadQuestions);
               });
               var d = document.createElement('button'); d.className = 'mini-btn danger'; d.textContent = 'Dismiss';
               d.addEventListener('click', function () {
-                sb.from('questions').update({ status: 'dismissed' }).eq('id', r.id).then(loadQuestions);
+                sb.rpc('set_question_status', { p_question_id: r.id, p_status: 'dismissed' }).then(loadQuestions);
               });
               acts.appendChild(a); acts.appendChild(d);
             }

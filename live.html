@@ -100,6 +100,7 @@
         <textarea id="ask-body" rows="2" maxlength="280" required placeholder="Ask Alex and Sam a question…" aria-label="Your question"></textarea>
         <button type="submit" class="cta ask-submit">Send question</button>
       </form>
+      <p class="ask-note" id="ask-note" role="status" hidden></p>
       <ol class="question-list" id="question-list"></ol>
       <p class="empty-note" id="questions-empty" hidden>No questions yet — be the first.</p>
     </div>
@@ -460,14 +461,66 @@
     var voted = {};
     try { voted = JSON.parse(localStorage.getItem('mm_voted') || '{}'); } catch (e) {}
 
-    MM.el('ask-form').addEventListener('submit', function (ev) {
+    // Spam hardening (client side): burst window — up to 3 submits per
+    // 45s (timestamps in localStorage, so a reload doesn't reset it); the
+    // 4th waits for the oldest to age out. Normal links are fine; only
+    // executable-download URLs and anonymizing shorteners are blocked
+    // (the DB policy enforces the same, so scripts can't bypass this).
+    var askForm = MM.el('ask-form');
+    var askNote = MM.el('ask-note');
+    var askBtn = askForm.querySelector('.ask-submit');
+    var EXEC_RE = /(https?:\/\/|www\.)\S*\/\S*?\.(exe|msi|scr|bat|cmd|com|jar|vbs|js|apk|dmg|pkg)([?#]\S*)?(\s|$)/i;
+    var SHORT_RE = /(^|\s)(https?:\/\/)?(www\.)?(bit\.ly|tinyurl\.com|rb\.gy|cutt\.ly|is\.gd|v\.gd|shorturl\.at|t\.ly)(\/\S*)?(\s|$)/i;
+    var WINDOW_MS = 45000, MAX_BURST = 3;
+    var askTimes = [];
+    try { askTimes = JSON.parse(localStorage.getItem('mm_ask_times') || '[]'); } catch (e) {}
+    if (!Array.isArray(askTimes)) askTimes = [];
+    var cooldownTimer = null;
+    function burstLeft() {
+      var cut = Date.now() - WINDOW_MS;
+      askTimes = askTimes.filter(function (t) { return t > cut; });
+      if (askTimes.length < MAX_BURST) return 0;
+      return Math.max(0, askTimes[0] + WINDOW_MS - Date.now());
+    }
+    function showNote(text, isError) {
+      askNote.textContent = text;
+      askNote.className = 'ask-note' + (isError ? ' error' : '');
+      askNote.hidden = false;
+    }
+    function renderCooldown() {
+      var left = burstLeft();
+      if (left > 0) {
+        askBtn.disabled = true;
+        showNote('Slow down just a sec — you can ask another in ' + Math.ceil(left / 1000) + 's', false);
+        cooldownTimer = setTimeout(renderCooldown, 500);
+      } else {
+        askBtn.disabled = false;
+        if (cooldownTimer) { clearTimeout(cooldownTimer); cooldownTimer = null; }
+        if (askNote.textContent.indexOf('you can ask another') !== -1) askNote.hidden = true;
+      }
+    }
+    renderCooldown();
+
+    askForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
+      if (burstLeft() > 0) { renderCooldown(); return; }
       var name = MM.el('ask-name').value.trim().slice(0, 40);
       var body = MM.el('ask-body').value.trim().slice(0, 280);
       if (!body || !showId) return;
+      if (EXEC_RE.test(name) || EXEC_RE.test(body) || SHORT_RE.test(name) || SHORT_RE.test(body)) {
+        showNote('That link type isn\u2019t allowed — try posting the text another way.', true);
+        return;
+      }
       sb.from('questions').insert({ show_id: showId, name: name || null, body: body })
         .then(function (res) {
-          if (!res.error) { MM.el('ask-body').value = ''; }
+          if (res.error) {
+            showNote('Couldn\u2019t send — give it a moment and try again.', true);
+            return;
+          }
+          MM.el('ask-body').value = '';
+          askTimes.push(Date.now());
+          try { localStorage.setItem('mm_ask_times', JSON.stringify(askTimes)); } catch (e) {}
+          renderCooldown();
         });
     });
 
@@ -497,9 +550,12 @@
               if (voted[qid]) return;
               var countEl = btn.querySelector('.upvote-count');
               var n = parseInt(countEl.textContent, 10) || 0;
-              sb.from('questions').update({ upvotes: n + 1 }).eq('id', qid).then(function () {
+              sb.rpc('increment_upvote', { p_question_id: qid }).then(function (res) {
+                if (res.error) return;
                 voted[qid] = 1;
                 try { localStorage.setItem('mm_voted', JSON.stringify(voted)); } catch (e) {}
+                countEl.textContent = n + 1;
+                btn.classList.add('voted');
               });
             });
           });
