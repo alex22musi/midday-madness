@@ -1,8 +1,17 @@
 # Performance Baseline (Phase 4.1)
 
-**Measured:** Nov 10, 2026 (night) · **Against:** production, https://alex22musi.github.io/midday-madness/ · **Tool:** Lighthouse 12, mobile emulation, simulated throttling (Lighthouse's default Slow-4G profile), headless Chrome, one run per page.
+**Measured:** Nov 10, 2026 (night) · **Against:** production on GitHub Pages, https://alex22musi.github.io/midday-madness/ (see the host note below) · **Tool:** Lighthouse 12, mobile emulation, simulated throttling (Lighthouse's default Slow-4G profile), headless Chrome, one run per page.
 
 > Single runs on a laptop; treat scores as ±5. Re-run 3x and take the median before judging a change smaller than that.
+
+> **Host.** The numbers in this document were first taken on GitHub Pages. **Vercel (`https://midday-madness.vercel.app/`) is the primary host going forward** (confirmed Nov 11, 2026), so re-measure there before judging a change. A same-day re-run of the home page on both hosts (Wed Nov 11, about 12:50 PM ET, same Lighthouse settings):
+>
+> | Home | Score | FCP | LCP | CLS | Total transfer | Requests |
+> |---|---|---|---|---|---|---|
+> | Vercel | 99 | 1.0 s | 2.2 s | 0 | 686 KB | 13 |
+> | GitHub Pages | 99 | 1.0 s | 2.0 s | 0 | 601 KB | 13 |
+>
+> These differ from the Tuesday-night run below (CLS 0 vs 0.057, total transfer 601–686 KB vs 1,038 KB). The cause was not investigated (a deploy in between, the time of day, or ordinary run-to-run variance), so the Tuesday figures stay as the baseline of record. Time-to-audio below was also measured on Pages and should be repeated on Vercel.
 
 ## Results
 
@@ -64,8 +73,8 @@ How to read this:
 ## How to re-run
 
 ```bash
-npx -y lighthouse@12 https://alex22musi.github.io/midday-madness/ \
+npx -y lighthouse@12 https://midday-madness.vercel.app/ \
   --form-factor=mobile --only-categories=performance \
   --output=json --output-path=./home.json --chrome-flags="--headless=new"
 ```
-Swap the URL for `.../live.html`. Run it against production or a deployed branch preview, since localhost has no real network cost.
+Swap the URL for `.../live.html`, and prefer `https://midday-madness.vercel.app/` (the primary host). Run it against production or a deployed branch preview, since localhost has no real network cost.
