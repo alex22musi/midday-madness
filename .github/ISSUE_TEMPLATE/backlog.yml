@@ -1,0 +1,43 @@
+name: Backlog item
+description: Capture an idea for later without starting it
+title: "[Backlog] "
+labels:
+  - backlog
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What problem or opportunity are we preserving?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What should be true when this is eventually done? (User-visible, not implementation.)
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Likely area
+      options:
+        - Player / Media Session
+        - Live page
+        - Producer console
+        - Clips
+        - Episodes / archive
+        - Performance
+        - Design / layout
+        - Supabase / backend
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: no_build
+    attributes:
+      label: Capture only
+      options:
+        - label: Do not start building this until Alex explicitly revives it. Nothing from the backlog ships on its own.
+          required: true
