@@ -1,0 +1,25 @@
+# Source of truth for labels. Apply with:
+#   gh label create <name> --color <hex> --description "<text>" --force   (per row)
+# Keep GitHub's defaults (bug, documentation, etc.) — these add to them.
+- {name: "type:bug", color: "d73a4a", description: "Something is broken"}
+- {name: "type:feature", color: "a2eeef", description: "New capability"}
+- {name: "type:perf", color: "fbca04", description: "Speed, payload, smoothness"}
+- {name: "type:ux", color: "d876e3", description: "Design / layout / interaction"}
+- {name: "type:chore", color: "cfd3d7", description: "Docs, cleanup, data, tooling"}
+- {name: "priority:P0", color: "b60205", description: "Live show broken — fix now"}
+- {name: "priority:P1", color: "d93f0b", description: "This week"}
+- {name: "priority:P2", color: "fbca04", description: "This month"}
+- {name: "priority:P3", color: "0e8a16", description: "Someday"}
+- {name: "area:player", color: "1d76db", description: "Episode/clip player, Media Session"}
+- {name: "area:live", color: "1d76db", description: "Live show page"}
+- {name: "area:producer", color: "1d76db", description: "Producer console"}
+- {name: "area:clips", color: "1d76db", description: "Clips grid and files"}
+- {name: "area:episodes", color: "1d76db", description: "Episode data and audio"}
+- {name: "area:supabase", color: "1d76db", description: "Backend, RLS, keep-alive"}
+- {name: "area:perf", color: "1d76db", description: "Performance budgets"}
+- {name: "area:a11y", color: "1d76db", description: "Accessibility"}
+- {name: "area:design", color: "1d76db", description: "Visual design"}
+- {name: "area:docs", color: "1d76db", description: "Docs and wiki"}
+- {name: "alex-call", color: "e3a83c", description: "User-facing design call — Alex decides, don't guess"}
+- {name: "parked", color: "6e7781", description: "Faded/backlogged by Alex — do not build"}
+- {name: "backlog", color: "ededed", description: "Captured for later, not started"}

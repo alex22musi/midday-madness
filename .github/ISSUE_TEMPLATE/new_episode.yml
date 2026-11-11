@@ -1,0 +1,38 @@
+name: New episode
+description: Checklist for adding a full episode to the player
+title: "[Episode] N. "
+labels:
+  - area:episodes
+  - type:chore
+body:
+  - type: input
+    id: date
+    attributes:
+      label: Show date
+      placeholder: "2026-11-11"
+    validations:
+      required: true
+  - type: input
+    id: number
+    attributes:
+      label: Episode number
+      description: Next in sequence. Titles are "N. Mon D, YYYY Midday Madness" (creative titles get appended later, data-only).
+    validations:
+      required: true
+  - type: checkboxes
+    id: steps
+    attributes:
+      label: Checklist
+      options:
+        - label: Recording is in the Full Episodes folder, named `YYYY-MM-DD — Midday Madness.<ext>`
+        - label: Web encode made (~48 kbps mono, faststart) and saved as `assets/episodes/ep-YYYY-MM-DD.<ext>`
+        - label: "Encode integrity check passed: full decode + duration matches the source"
+        - label: "`data/episodes.json` entry added — date, label, numbered title, description, durationSec, audioFile"
+        - label: "`node scripts/ci/check-site.cjs` passes (numbering, label/title/date agree, file exists)"
+        - label: Large media committed one file per commit (GitHub rejects several big files at once)
+        - label: Episode loads and plays from the picker on a phone; time-to-audio under 2s
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything unusual (missing recording, split file, gap in the schedule — Oct 14, 2026 is permanently skipped).

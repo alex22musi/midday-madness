@@ -1,0 +1,31 @@
+name: CI
+
+# Midday Madness is a static site: no build, no dependencies.
+# This checks what can actually break it — data files, media references,
+# secrets, and the performance budget. Same script runs locally:
+#   node scripts/ci/check-site.cjs
+# Public repo, so Actions minutes are free; no throttling needed.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  site-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Data, media, secrets and payload-budget checks
+        run: node scripts/ci/check-site.cjs
