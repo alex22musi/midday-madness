@@ -62,6 +62,19 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 /* J3 overlay chip */
 .j3{position:absolute;right:.5rem;bottom:.5rem;background:rgba(10,14,28,.82);border:1px solid rgba(227,168,60,.55);color:var(--gold-soft);border-radius:999px;font-size:.74rem;font-weight:800;padding:.3rem .65rem;cursor:pointer;backdrop-filter:blur(4px)}
 .j3:hover{background:rgba(10,14,28,.95)}
+/* M2 swipe rows */
+.ep-row{margin-bottom:.9rem}
+.ep-row h5{color:var(--gold);font-size:.72rem;letter-spacing:.12em;margin-bottom:.45rem}
+.snap-row{display:flex;gap:.6rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:.3rem;-webkit-overflow-scrolling:touch}
+.snap-row::-webkit-scrollbar{height:4px}
+.snap-row::-webkit-scrollbar-thumb{background:rgba(227,168,60,.4);border-radius:99px}
+.mini{flex:0 0 128px;scroll-snap-align:start}
+.mini .poster{border-radius:10px;overflow:hidden;aspect-ratio:9/16}
+.mini .poster img{width:100%;height:100%;object-fit:cover;display:block}
+.mini p{font-size:.72rem;font-weight:600;line-height:1.3;margin-top:.35rem}
+.mini span{color:var(--muted);font-size:.66rem;font-weight:500}
+/* M3 featured */
+.feat .ccard{margin-bottom:.7rem}
 /* phone frame */
 .phone{width:372px;max-width:100%;margin:0 auto;border:1px solid rgba(227,168,60,.35);border-radius:22px;padding:.8rem;background:var(--navy-2)}
 .phone .grid{grid-template-columns:1fr 1fr;gap:.7rem}
@@ -74,16 +87,16 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 <body>
 <div class="wrap">
 <header>
-  <h1>UI MOCKUPS — PICK A LETTER FOR EACH</h1>
-  <p>Nothing here changes the live site. Three options for the <strong>episode picker</strong>, three for the <strong>“in the episode” button</strong>, plus the tightened clip grid. Tap the picker options — they switch like the real thing. Tell me e.g. “P2 + J3” and I’ll build exactly that.</p>
+  <h1>UI MOCKUPS</h1>
+  <p>Pick one letter per part — e.g. “P2 + J3 + M2”. Nothing here is live yet.</p>
 </header>
 
 <h2 class="part">PART 1 — EPISODE PICKER</h2>
-<p class="part-note">How you switch episodes inside the player.</p>
+<p class="part-note"></p>
 
 <div class="mock">
   <span class="mock-tag">P1</span><h3>Pill tabs</h3>
-  <p class="why">Episodes as tappable pills right under the player head. No menu to open — one tap switches, it always fits the player because it uses the same gold pill language as the rest of the site.</p>
+  <p class="why">One tap, no menu.</p>
   <div class="stage">
     <div class="p-head"><img class="p-art" src="https://alex22musi.github.io/midday-madness/assets/logo.jpg" alt="">
       <div><div class="p-kicker">FULL EPISODE</div><div class="p-title" id="p1-title">Sep 23, 2026 — the full episode</div></div></div>
@@ -98,7 +111,7 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 
 <div class="mock">
   <span class="mock-tag">P2</span><h3>Quiet select</h3>
-  <p class="why">The date itself is the control — gold text with a tiny chevron, no box, no border. It disappears into the player head until you need it. Cleanest of the three.</p>
+  <p class="why">The date is the control. No box, no border.</p>
   <div class="stage">
     <div class="p-head"><img class="p-art" src="https://alex22musi.github.io/midday-madness/assets/logo.jpg" alt="">
       <div><div class="p-kicker">FULL EPISODE</div>
@@ -109,7 +122,7 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 
 <div class="mock">
   <span class="mock-tag">P3</span><h3>Stepper</h3>
-  <p class="why">Prev / next arrows with the date between them, under the scrub bar. The show is weekly, so stepping is natural — and it scales to 20 episodes without a long menu.</p>
+  <p class="why">‹ › through weeks. Scales to any archive size.</p>
   <div class="stage">
     <div class="p-head"><img class="p-art" src="https://alex22musi.github.io/midday-madness/assets/logo.jpg" alt="">
       <div><div class="p-kicker">FULL EPISODE</div><div class="p-title" id="p3-title">Sep 23, 2026 — the full episode</div></div></div>
@@ -123,11 +136,11 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 </div>
 
 <h2 class="part">PART 2 — “IN THE EPISODE” BUTTON</h2>
-<p class="part-note">How a clip card jumps into the full episode. Cards below already use the tightened layout — smaller padding, two-line description max.</p>
+<p class="part-note"></p>
 
 <div class="mock">
   <span class="mock-tag">J1</span><h3>In the meta line</h3>
-  <p class="why">No button at all. The timestamp becomes a quiet gold link inside the meta line — the card stays pure: poster, title, one line of facts, short blurb.</p>
+  <p class="why">No button. Just a gold link in the facts line.</p>
   <div class="stage"><div class="grid" style="grid-template-columns:1fr;max-width:300px;margin:0 auto">
     <article class="ccard"><div class="poster"><img src="https://alex22musi.github.io/midday-madness/assets/clips/clip-2026-09-23-best-qb-in-college-football.jpg" alt=""></div>
       <div class="cbody"><h4>Best QB in College Football</h4>
@@ -138,7 +151,7 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 
 <div class="mock">
   <span class="mock-tag">J2</span><h3>Footer strip</h3>
-  <p class="why">A slim strip fused to the bottom of the card — reads as part of the card, not a button stuck on it. Big tap target, works great on phones.</p>
+  <p class="why">Fused to the card. Big tap target.</p>
   <div class="stage"><div class="grid" style="grid-template-columns:1fr;max-width:300px;margin:0 auto">
     <article class="ccard"><div class="poster"><img src="https://alex22musi.github.io/midday-madness/assets/clips/clip-2026-09-23-best-qb-in-college-football.jpg" alt=""></div>
       <div class="cbody"><h4>Best QB in College Football</h4>
@@ -150,7 +163,7 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
 
 <div class="mock">
   <span class="mock-tag">J3</span><h3>On the poster</h3>
-  <p class="why">The button moves onto the video itself — a small dark chip in the corner, like YouTube/TikTok UI. Card body shrinks to just title + meta. Most “app-like” of the three.</p>
+  <p class="why">Chip on the video. Body = title + facts only.</p>
   <div class="stage"><div class="grid" style="grid-template-columns:1fr;max-width:300px;margin:0 auto">
     <article class="ccard"><div class="poster"><img src="https://alex22musi.github.io/midday-madness/assets/clips/clip-2026-09-23-best-qb-in-college-football.jpg" alt=""><button class="j3" type="button">▶ 12:02 in episode</button></div>
       <div class="cbody"><h4>Best QB in College Football</h4>
@@ -159,22 +172,37 @@ p.part-note{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:1
   </div></div>
 </div>
 
-<h2 class="part">PART 3 — THE TIGHTENED GRID</h2>
-<p class="part-note">Smaller gaps, tighter cards, descriptions capped at two lines — shown here with J2. Below it, the same grid inside a phone frame: two compact columns, posters + titles only.</p>
+<h2 class="part">PART 3 — THE TIGHTENED GRID · DESKTOP</h2>
+<p class="part-note"></p>
 
 <div class="mock">
-  <span class="mock-tag">GRID</span><h3>Desktop — compact</h3>
-  <p class="why">Same 9:16 posters, but the grid breathes like a grid instead of a stack of articles.</p>
+  <span class="mock-tag">GRID</span><h3>Compact cards, 2-line descriptions</h3>
+  <p class="why"></p>
   <div class="stage"><div class="grid" id="demo-grid"></div></div>
 </div>
 
+<h2 class="part">PART 4 — MOBILE LAYOUT</h2>
+<p class="part-note">The fix for the endless phone scroll. Pick one.</p>
+
 <div class="mock">
-  <span class="mock-tag">MOBILE</span><h3>Phone — two-up</h3>
-  <p class="why">On phones the grid goes two across with title + date only, so you can actually browse 9 clips without endless scrolling. Tapping a poster still plays the clip.</p>
+  <span class="mock-tag">M1</span><h3>Two-up grid</h3>
+  <p class="why">Two compact columns. 9 clips ≈ 5 rows.</p>
   <div class="phone"><div class="grid" id="demo-phone"></div></div>
 </div>
 
-<p class="pick-note">Reply with a combo — <strong>P1 / P2 / P3</strong> for the picker and <strong>J1 / J2 / J3</strong> for the button — and I’ll rebuild the homepage to match, then verify it live the same way Phase 1 was verified.</p>
+<div class="mock">
+  <span class="mock-tag">M2</span><h3>Swipe rows by episode</h3>
+  <p class="why">One row per episode, swipe sideways. Whole library ≈ 3 short rows. Try swiping it.</p>
+  <div class="phone"><div id="demo-rows"></div></div>
+</div>
+
+<div class="mock">
+  <span class="mock-tag">M3</span><h3>Featured + two-up</h3>
+  <p class="why">Newest clip full-width, the rest two-up underneath.</p>
+  <div class="phone"><div id="demo-feat"></div></div>
+</div>
+
+<p class="pick-note">Reply: <strong>P?</strong> picker · <strong>J?</strong> button · <strong>M?</strong> mobile — e.g. “P2 J3 M2”.</p>
 </div>
 
 <script>
@@ -214,6 +242,15 @@ function cardHTML(c) {
 }
 document.getElementById('demo-grid').innerHTML = CLIPS.map(cardHTML).join('');
 document.getElementById('demo-phone').innerHTML = CLIPS.map(cardHTML).join('');
+function miniHTML(c) {
+  return '<div class="mini"><div class="poster"><img loading="lazy" src="' + BASE + c[0] + '.jpg" alt=""></div><p>' + c[1] + '<br><span>▶ ' + c[3] + ' in episode</span></p></div>';
+}
+var groups = [['NOV 4, 2026', CLIPS.slice(0, 3)], ['SEP 23, 2026', CLIPS.slice(3, 6)]];
+document.getElementById('demo-rows').innerHTML = groups.map(function (g) {
+  return '<div class="ep-row"><h5>' + g[0] + '</h5><div class="snap-row">' + g[1].map(miniHTML).join('') + '</div></div>';
+}).join('');
+document.getElementById('demo-feat').innerHTML =
+  '<div class="feat">' + cardHTML(CLIPS[0]) + '</div><div class="grid">' + CLIPS.slice(1, 5).map(cardHTML).join('') + '</div>';
 </script>
 </body>
 </html>
