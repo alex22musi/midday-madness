@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110b">
+<link rel="stylesheet" href="styles.css?v=20261110c">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -84,9 +84,11 @@
           <span class="player-title" id="player-title">November 4, 2026 &mdash; the full episode</span>
         </div>
       </div>
-      <label class="episode-picker">Episode
-        <select id="episode-select" aria-label="Choose an episode"></select>
-      </label>
+      <div class="ep-stepper" id="ep-stepper">
+        <button type="button" id="ep-prev" aria-label="Previous episode">&#8249;</button>
+        <div class="ep-cur"><span id="ep-cur-label">Nov 4, 2026</span><small id="ep-cur-count"></small></div>
+        <button type="button" id="ep-next" aria-label="Next episode">&#8250;</button>
+      </div>
       <div class="player-scrub">
         <span class="player-time" id="player-current">0:00</span>
         <div class="player-bar" id="player-bar" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
@@ -128,7 +130,6 @@
         </label>
       </div>
     </div>
-    <p class="player-hint">Stream the full hour &mdash; debates, hot takes, and the best of Wednesday&rsquo;s show.</p>
   </section>
 
   <section id="about" class="about">
@@ -375,11 +376,23 @@
   var moreBtn = document.getElementById('clips-more');
   var emptyMsg = document.getElementById('clips-empty');
   var audio = document.getElementById('player-audio');
-  var select = document.getElementById('episode-select');
   var heading = document.getElementById('episode-heading');
   var pTitle = document.getElementById('player-title');
   var pKicker = document.getElementById('player-kicker');
   var clips = [], episodes = {}, shown = 0, currentEp = null;
+  var epList = [], epIdx = -1;
+  var prevBtn = document.getElementById('ep-prev');
+  var nextBtn = document.getElementById('ep-next');
+  var curLabel = document.getElementById('ep-cur-label');
+  var curCount = document.getElementById('ep-cur-count');
+
+  function syncStepper() {
+    if (epIdx < 0) return;
+    curLabel.textContent = epList[epIdx].label;
+    curCount.textContent = 'EPISODE ' + (epIdx + 1) + ' OF ' + epList.length;
+    prevBtn.disabled = epIdx <= 0;
+    nextBtn.disabled = epIdx >= epList.length - 1;
+  }
 
   function fmtDur(s) { var m = Math.floor(s / 60), ss = s % 60; return m + ':' + (ss < 10 ? '0' : '') + ss; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -393,7 +406,8 @@
       if (autoplay) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     }
     currentEp = date;
-    if (select) select.value = date;
+    epIdx = epList.findIndex(function (e) { return e.date === date; });
+    syncStepper();
     var label = ep.label + ' \u2014 the full episode';
     if (heading) heading.textContent = label;
     if (pTitle) pTitle.textContent = label;
@@ -415,9 +429,9 @@
       '<video controls playsinline preload="metadata" poster="' + esc(clip.poster) + '" src="' + esc(clip.file) + '"></video>' +
       '<div class="clip-body"><h3>' + esc(clip.title) + '</h3>' +
       '<p class="meta">' + esc(clip.episodeLabel) + ' &bull; ' + fmtDur(clip.durationSec) + '</p>' +
-      '<p>' + esc(clip.blurb || '') + '</p>' +
-      '<button type="button" class="ts-chip" data-ep="' + esc(clip.episodeDate) + '" data-t="' + clip.startSec + '"' +
-      ' aria-label="Play the ' + esc(clip.episodeLabel) + ' episode at ' + esc(clip.timestampLabel) + '">\u25B6 at ' + esc(clip.timestampLabel) + ' in the episode</button></div>';
+      '<p class="blurb">' + esc(clip.blurb || '') + '</p></div>' +
+      '<button type="button" class="strip-btn" data-ep="' + esc(clip.episodeDate) + '" data-t="' + clip.startSec + '"' +
+      ' aria-label="Play the ' + esc(clip.episodeLabel) + ' episode at ' + esc(clip.timestampLabel) + '">\u25B6 <span class="strip-long">HEAR IT IN THE EPISODE &middot; </span>' + esc(clip.timestampLabel) + '</button>';
     return art;
   }
   function renderMore() {
@@ -429,7 +443,7 @@
     moreBtn.hidden = shown >= clips.length;
   }
   grid.addEventListener('click', function (e) {
-    var btn = e.target.closest ? e.target.closest('.ts-chip') : null;
+    var btn = e.target.closest ? e.target.closest('.strip-btn') : null;
     if (!btn) return;
     var t = parseInt(btn.getAttribute('data-t'), 10);
     if (loadEpisode(btn.getAttribute('data-ep'), t, true)) {
@@ -441,28 +455,23 @@
     }
   });
   moreBtn.addEventListener('click', renderMore);
-  if (select) select.addEventListener('change', function () { loadEpisode(select.value, 0, false); });
+  if (prevBtn) prevBtn.addEventListener('click', function () { if (epIdx > 0) loadEpisode(epList[epIdx - 1].date, 0, false); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { if (epIdx < epList.length - 1) loadEpisode(epList[epIdx + 1].date, 0, false); });
 
   function init(clipsData, epsData) {
     clips = clipsData.slice().sort(function (a, b) { return b.episodeDate.localeCompare(a.episodeDate) || a.startSec - b.startSec; });
     epsData.forEach(function (ep) { episodes[ep.date] = ep; });
-    if (select) {
-      epsData.filter(function (ep) { return ep.audioFile; })
-        .sort(function (a, b) { return b.date.localeCompare(a.date); })
-        .forEach(function (ep) {
-          var o = document.createElement('option');
-          o.value = ep.date; o.textContent = ep.label;
-          select.appendChild(o);
-        });
-    }
+    epList = epsData.filter(function (ep) { return ep.audioFile; })
+      .sort(function (a, b) { return a.date.localeCompare(b.date); });
     if (!clips.length) { emptyMsg.hidden = false; return; }
     renderMore();
     var q = new URLSearchParams(location.search);
     var ep = q.get('ep'), t = parseInt(q.get('t'), 10);
     if (ep && episodes[ep]) loadEpisode(ep, isNaN(t) ? 0 : t, false);
-    else {
-      var latest = epsData.filter(function (e2) { return e2.audioFile; }).sort(function (a, b) { return b.date.localeCompare(a.date); })[0];
-      if (latest) { currentEp = latest.date; if (select) select.value = latest.date; }
+    else if (epList.length) {
+      currentEp = epList[epList.length - 1].date;
+      epIdx = epList.length - 1;
+      syncStepper();
     }
   }
   Promise.all([
