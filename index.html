@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110f">
+<link rel="stylesheet" href="styles.css?v=20261110g">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -445,13 +445,86 @@ document.addEventListener('play', function (e) {
     var art = document.createElement('article');
     art.className = 'clip-card';
     art.innerHTML =
-       '<video controls playsinline preload="none" data-poster="' + esc(clip.poster) + '" data-src="' + esc(clip.file) + '"></video>' +
+       '<div class="clip-media">' +
+       '<video playsinline preload="none" data-poster="' + esc(clip.poster) + '" data-src="' + esc(clip.file) + '"></video>' +
+       '<button type="button" class="cv-bigplay" aria-label="Play clip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>' +
+       '<div class="cv-bar">' +
+       '<button type="button" class="cv-btn cv-toggle" aria-label="Play or pause"><svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>' +
+       '<span class="cv-time">0:00 / ' + fmtDur(clip.durationSec) + '</span>' +
+       '<input type="range" class="cv-seek" min="0" max="1000" value="0" aria-label="Seek">' +
+       '<button type="button" class="cv-btn cv-pip" aria-label="Picture in picture"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke-width="2"/><rect x="12" y="12" width="6" height="4" rx="1"/></svg></button>' +
+       '<button type="button" class="cv-btn cv-fs" aria-label="Fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" fill="none" stroke-width="2.2" stroke-linecap="round"/></svg></button>' +
+       '</div></div>' +
       '<div class="clip-body"><h3>' + esc(clip.title) + '</h3>' +
       '<p class="meta">' + esc(clip.episodeLabel) + ' &bull; ' + fmtDur(clip.durationSec) + '</p>' +
       '<p class="blurb">' + esc(clip.blurb || '') + '</p></div>' +
       '<button type="button" class="strip-btn" data-ep="' + esc(clip.episodeDate) + '" data-t="' + clip.startSec + '"' +
       ' aria-label="Play the ' + esc(clip.episodeLabel) + ' episode at ' + esc(clip.timestampLabel) + '">\u25B6 <span class="strip-long">HEAR IT IN THE EPISODE &middot; </span>' + esc(clip.timestampLabel) + '</button>';
+    wireClipControls(art, clip);
     return art;
+  }
+
+  function wireClipControls(art, clip) {
+    var media = art.querySelector('.clip-media');
+    var video = art.querySelector('video');
+    var big = art.querySelector('.cv-bigplay');
+    var toggle = art.querySelector('.cv-toggle');
+    var seek = art.querySelector('.cv-seek');
+    var timeEl = art.querySelector('.cv-time');
+    var pipBtn = art.querySelector('.cv-pip');
+    var fsBtn = art.querySelector('.cv-fs');
+    var hideTimer = null;
+    function ensureSrc() {
+      if (!video.src && video.dataset.src) { video.poster = video.dataset.poster || ''; video.src = video.dataset.src; }
+    }
+    function dur() { return video.duration || clip.durationSec || 0; }
+    function togglePlay() {
+      ensureSrc();
+      if (video.paused) { var p = video.play(); if (p && p.catch) p.catch(function () {}); }
+      else video.pause();
+    }
+    function showBar() {
+      media.classList.remove('cv-hide');
+      if (hideTimer) clearTimeout(hideTimer);
+      if (!video.paused) hideTimer = setTimeout(function () { media.classList.add('cv-hide'); }, 2600);
+    }
+    video.addEventListener('click', togglePlay);
+    big.addEventListener('click', togglePlay);
+    toggle.addEventListener('click', function (e) { e.stopPropagation(); togglePlay(); });
+    video.addEventListener('play', function () { media.classList.add('cv-playing'); showBar(); });
+    video.addEventListener('pause', function () { media.classList.remove('cv-playing', 'cv-hide'); if (hideTimer) clearTimeout(hideTimer); });
+    video.addEventListener('ended', function () { media.classList.remove('cv-playing', 'cv-hide'); });
+    video.addEventListener('timeupdate', function () {
+      var d = dur(); if (!d) return;
+      var pct = Math.round(video.currentTime / d * 1000);
+      if (document.activeElement !== seek) seek.value = pct;
+      seek.style.background = 'linear-gradient(90deg, var(--gold) ' + (pct / 10) + '%, rgba(255,255,255,.25) ' + (pct / 10) + '%)';
+      timeEl.textContent = fmtDur(Math.floor(video.currentTime)) + ' / ' + fmtDur(Math.floor(d));
+    });
+    seek.addEventListener('input', function () {
+      var d = dur(); if (!d) return;
+      video.currentTime = seek.value / 1000 * d;
+    });
+    media.addEventListener('pointermove', showBar);
+    media.addEventListener('touchstart', showBar, { passive: true });
+    if (document.pictureInPictureEnabled && video.requestPictureInPicture) {
+      pipBtn.addEventListener('click', function (e) {
+        e.stopPropagation(); ensureSrc();
+        if (document.pictureInPictureElement) document.exitPictureInPicture();
+        else video.requestPictureInPicture().catch(function () {});
+      });
+    } else if (typeof video.webkitSetPresentationMode === 'function') {
+      pipBtn.addEventListener('click', function (e) {
+        e.stopPropagation(); ensureSrc();
+        try { video.webkitSetPresentationMode(video.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture'); } catch (err) {}
+      });
+    } else { pipBtn.style.display = 'none'; }
+    fsBtn.addEventListener('click', function (e) {
+      e.stopPropagation(); ensureSrc();
+      if (media.requestFullscreen) { if (document.fullscreenElement) document.exitFullscreen(); else media.requestFullscreen().catch(function () {}); }
+      else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+      else fsBtn.style.display = 'none';
+    });
   }
   var lazyIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function (entries) {
     entries.forEach(function (en) {

@@ -412,3 +412,44 @@ footer {
   border-top: 1px solid rgba(227, 168, 60, 0.25);
   text-align: center; padding: 1.6rem 1rem; color: var(--muted); font-size: 0.9rem;
 }
+
+/* Custom clip controls (2026-11-10): nothing overlays the top of the clip;
+   the bar lives at the bottom — PiP + fullscreen bottom-right. */
+.clip-media { position: relative; background: #000; }
+.clip-media video { width: 100%; aspect-ratio: 9 / 16; display: block; object-fit: contain; }
+.clip-media:fullscreen { display: flex; align-items: center; justify-content: center; }
+.clip-media:fullscreen video { width: 100%; height: 100%; aspect-ratio: auto; }
+.cv-bigplay {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 58px; height: 58px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--gold); color: #131313; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 22px rgba(0,0,0,.5); transition: opacity .18s ease, transform .18s ease; z-index: 3;
+}
+.cv-bigplay svg { width: 26px; height: 26px; fill: currentColor; margin-left: 3px; }
+.clip-media.cv-playing .cv-bigplay { opacity: 0; pointer-events: none; transform: translate(-50%, -50%) scale(.85); }
+.cv-bar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; align-items: center; gap: .45rem; padding: .5rem .55rem .55rem;
+  background: linear-gradient(transparent, rgba(3,5,12,.88) 45%);
+  transition: opacity .25s ease;
+}
+.clip-media.cv-hide .cv-bar { opacity: 0; pointer-events: none; }
+.cv-btn {
+  flex: 0 0 auto; width: 32px; height: 32px; border: none; border-radius: 8px; cursor: pointer;
+  background: rgba(255,255,255,.08); color: #fff; display: flex; align-items: center; justify-content: center; padding: 0;
+}
+.cv-btn svg { width: 17px; height: 17px; fill: currentColor; stroke: currentColor; }
+.cv-btn .ic-pause { display: none; }
+.clip-media.cv-playing .cv-btn .ic-pause { display: block; }
+.clip-media.cv-playing .cv-btn .ic-play { display: none; }
+.cv-time { flex: 0 0 auto; font-size: .66rem; font-weight: 600; color: #e8eaf2; font-variant-numeric: tabular-nums; }
+.cv-seek {
+  flex: 1 1 auto; min-width: 0; -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,.25); outline: none; cursor: pointer; padding: 0;
+}
+.cv-seek::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 13px; height: 13px; border-radius: 50%;
+  background: #fff; border: none; box-shadow: 0 1px 5px rgba(0,0,0,.5);
+}
+.cv-seek::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #fff; border: none; box-shadow: 0 1px 5px rgba(0,0,0,.5); }
+.cv-seek::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255,255,255,.25); }
