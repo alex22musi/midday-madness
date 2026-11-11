@@ -543,6 +543,33 @@ document.addEventListener('play', function (e) {
   }
 
   var loadToken = 0;
+
+  /* Phase 5.2: resume where you left off. Explicit seeks (clip jumps,
+     ?t= shared links) always win over a saved position. */
+  var POS_KEY = 'mm_ep_pos_v1';
+  var posMap = {};
+  try { posMap = JSON.parse(localStorage.getItem(POS_KEY) || '{}') || {}; } catch (e) { posMap = {}; }
+  function persistPos() { try { localStorage.setItem(POS_KEY, JSON.stringify(posMap)); } catch (e) {} }
+  function savePos() {
+    if (!currentEp || !audio.duration || !isFinite(audio.duration)) return;
+    var tPos = Math.floor(audio.currentTime);
+    if (tPos > 5 && tPos < audio.duration - 10) posMap[currentEp] = tPos; else delete posMap[currentEp];
+    persistPos();
+  }
+  var lastPosSave = 0;
+  audio.addEventListener('timeupdate', function () {
+    var now = Date.now();
+    if (now - lastPosSave >= 5000) { lastPosSave = now; savePos(); }
+  });
+  audio.addEventListener('pause', savePos);
+  audio.addEventListener('ended', function () {
+    if (currentEp) { delete posMap[currentEp]; persistPos(); }
+  });
+  function resumeTarget(ep) {
+    var s = posMap[ep.date];
+    if (typeof s !== 'number' || !ep.durationSec) return null;
+    return (s > 5 && s < ep.durationSec * 0.9) ? s : null;
+  }
   function loadEpisode(date, seekSec, autoplay) {
     var ep = episodes[date];
     if (!ep || !ep.audioFile) return false;
@@ -551,6 +578,10 @@ document.addEventListener('play', function (e) {
     function go() {
       if (token !== loadToken) return; // a newer switch superseded this one
       if (typeof seekSec === 'number') { try { audio.currentTime = seekSec; } catch (e) {} }
+      else {
+        var rt = resumeTarget(ep);
+        if (rt) { try { audio.currentTime = rt; } catch (e) {} }
+      }
       if (autoplay) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     }
     currentEp = date;
@@ -710,6 +741,15 @@ document.addEventListener('play', function (e) {
       var latest = epList[epList.length - 1];
       if (pTitle && latest.title) pTitle.textContent = latest.title;
       if (latest.title) setEpMediaSession(latest.title);
+      var rt0 = resumeTarget(latest);
+      if (rt0) {
+        var applyResume = function () {
+          if (audio.currentTime > 2) return; /* listener already started/seeked on their own */
+          try { audio.currentTime = rt0; } catch (e) {}
+        };
+        if (audio.readyState >= 1) applyResume();
+        else audio.addEventListener('loadedmetadata', function h2() { audio.removeEventListener('loadedmetadata', h2); applyResume(); });
+      }
     }
   }
   Promise.all([
