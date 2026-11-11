@@ -106,5 +106,41 @@
     "file": "assets/clips/clip-2026-09-16-chiefs-destroyed-the-broncos.mp4",
     "poster": "assets/clips/clip-2026-09-16-chiefs-destroyed-the-broncos.jpg",
     "blurb": "Monday night recap: the Chiefs destroyed the Broncos, and Mahomes is so back."
+  },
+  {
+    "id": "clip-2026-09-16-another-ryan-day-choke-job",
+    "title": "Another Ryan Day Choke Job",
+    "episodeDate": "2026-09-16",
+    "episodeLabel": "Sep 16, 2026",
+    "startSec": 604,
+    "timestampLabel": "10:04",
+    "durationSec": 58,
+    "file": "assets/clips/clip-2026-09-16-another-ryan-day-choke-job.mp4",
+    "poster": "assets/clips/clip-2026-09-16-another-ryan-day-choke-job.jpg",
+    "blurb": "Ohio State blew a 23-3 fourth-quarter lead at Texas — and Alex calls it what it is: another Ryan Day choke job."
+  },
+  {
+    "id": "clip-2026-09-16-caleb-williams-will-win-mvp",
+    "title": "Caleb Williams Will Win MVP",
+    "episodeDate": "2026-09-16",
+    "episodeLabel": "Sep 16, 2026",
+    "startSec": 2453,
+    "timestampLabel": "40:53",
+    "durationSec": 44,
+    "file": "assets/clips/clip-2026-09-16-caleb-williams-will-win-mvp.mp4",
+    "poster": "assets/clips/clip-2026-09-16-caleb-williams-will-win-mvp.jpg",
+    "blurb": "The bold prediction: Caleb Williams wins MVP under Ben Johnson — Mahomes-like, maybe more athletic."
+  },
+  {
+    "id": "clip-2026-09-16-off-the-mateer-train",
+    "title": "Off the Mateer Train",
+    "episodeDate": "2026-09-16",
+    "episodeLabel": "Sep 16, 2026",
+    "startSec": 981,
+    "timestampLabel": "16:21",
+    "durationSec": 37,
+    "file": "assets/clips/clip-2026-09-16-off-the-mateer-train.mp4",
+    "poster": "assets/clips/clip-2026-09-16-off-the-mateer-train.jpg",
+    "blurb": "After Oklahoma's dud at Michigan, Alex is officially off the John Mateer hype train."
   }
 ]
