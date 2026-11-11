@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110g">
+<link rel="stylesheet" href="styles.css?v=20261110h">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -80,12 +80,12 @@
         <div class="player-meta">
           <span class="player-kicker" id="player-kicker">Latest episode</span>
           <span class="player-title" id="player-title">10. Nov 4, 2026 Midday Madness</span>
+          <span class="player-sub" id="player-sub">Fall 2026 &middot; Episode 10 of 10</span>
         </div>
       </div>
-      <div class="ep-stepper" id="ep-stepper">
-        <button type="button" id="ep-prev" aria-label="Previous episode">&#8249;</button>
-        <div class="ep-cur"><span id="ep-cur-label">Nov 4, 2026</span><small id="ep-cur-count"></small></div>
-        <button type="button" id="ep-next" aria-label="Next episode">&#8250;</button>
+      <div class="ep-picker">
+        <button type="button" class="ep-allbtn" id="ep-allbtn" aria-expanded="false" aria-controls="ep-sheet">All episodes <span class="ep-chev" aria-hidden="true">&#9662;</span></button>
+        <div class="ep-sheet" id="ep-sheet" hidden></div>
       </div>
       <div class="player-scrub">
         <span class="player-time" id="player-current">0:00</span>
@@ -391,18 +391,69 @@ document.addEventListener('play', function (e) {
   var pKicker = document.getElementById('player-kicker');
   var clips = [], episodes = {}, shown = 0, currentEp = null;
   var epList = [], epIdx = -1;
-  var prevBtn = document.getElementById('ep-prev');
-  var nextBtn = document.getElementById('ep-next');
-  var curLabel = document.getElementById('ep-cur-label');
-  var curCount = document.getElementById('ep-cur-count');
+  var pSub = document.getElementById('player-sub');
+  var allBtn = document.getElementById('ep-allbtn');
+  var sheet = document.getElementById('ep-sheet');
 
-  function syncStepper() {
-    if (epIdx < 0) return;
-    curLabel.textContent = epList[epIdx].label;
-    curCount.textContent = 'EPISODE ' + (epIdx + 1) + ' OF ' + epList.length;
-    prevBtn.disabled = epIdx <= 0;
-    nextBtn.disabled = epIdx >= epList.length - 1;
+  function seasonOf(dateStr) {
+    var y = +dateStr.slice(0, 4), m = +dateStr.slice(5, 7);
+    if (m >= 8) return 'Fall ' + y;
+    if (m <= 5) return 'Spring ' + y;
+    return 'Summer ' + y;
   }
+  function syncPicker() {
+    if (epIdx < 0 || !epList.length) return;
+    var ep = epList[epIdx];
+    if (pSub) pSub.textContent = seasonOf(ep.date) + ' \u00B7 Episode ' + (epIdx + 1) + ' of ' + epList.length;
+    if (sheet) {
+      sheet.querySelectorAll('.ep-row').forEach(function (r) {
+        r.classList.toggle('now', r.getAttribute('data-date') === ep.date);
+      });
+    }
+  }
+  function buildSheet() {
+    if (!sheet) return;
+    var groups = {}, order = [];
+    epList.forEach(function (ep, i) {
+      var g = seasonOf(ep.date);
+      if (!groups[g]) { groups[g] = []; order.push(g); }
+      groups[g].push({ ep: ep, n: i + 1 });
+    });
+    order.reverse(); // newest season first
+    var html = '';
+    order.forEach(function (g) {
+      html += '<div class="ep-season">' + esc(g) + '</div>';
+      groups[g].slice().reverse().forEach(function (it) {
+        var d = new Date(it.ep.date + 'T12:00:00');
+        var wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+        var title = (it.ep.title || it.ep.label).replace(/^\d+\.\s*/, '');
+        html += '<button type="button" class="ep-row" data-date="' + it.ep.date + '">' +
+          '<span class="ep-badge">EP ' + it.n + '</span>' +
+          '<span class="ep-rmain"><span class="ep-rdate">' + wd + ' \u00B7 ' + esc(it.ep.label) + '</span>' +
+          '<span class="ep-rtitle">' + esc(title) + '</span></span>' +
+          '<span class="ep-rtime">' + fmtDur(it.ep.durationSec || 0) + '</span>' +
+          '<span class="ep-rplay" aria-hidden="true">\u25B6</span></button>';
+      });
+    });
+    sheet.innerHTML = html;
+    sheet.querySelectorAll('.ep-row').forEach(function (r) {
+      r.addEventListener('click', function () {
+        loadEpisode(r.getAttribute('data-date'), null, true);
+        toggleSheet(false);
+        var p = document.getElementById('player');
+        if (p && p.scrollIntoView) p.scrollIntoView({ block: 'nearest' });
+      });
+    });
+    syncPicker();
+  }
+  function toggleSheet(force) {
+    if (!sheet || !allBtn) return;
+    var open = typeof force === 'boolean' ? force : sheet.hidden;
+    sheet.hidden = !open;
+    allBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    allBtn.classList.toggle('open', open);
+  }
+  if (allBtn) allBtn.addEventListener('click', function () { toggleSheet(); });
 
   function fmtDur(s) { var m = Math.floor(s / 60), ss = s % 60; return m + ':' + (ss < 10 ? '0' : '') + ss; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -420,7 +471,13 @@ document.addEventListener('play', function (e) {
     }
     currentEp = date;
     epIdx = epList.findIndex(function (e) { return e.date === date; });
-    syncStepper();
+    syncPicker();
+    try {
+      var u = new URL(location.href);
+      u.searchParams.set('ep', date);
+      if (typeof seekSec === 'number') u.searchParams.set('t', seekSec); else u.searchParams.delete('t');
+      history.replaceState(null, '', u);
+    } catch (e) {}
     var label = ep.title || (ep.label + ' \u2014 the full episode');
     if (pTitle) pTitle.textContent = label;
     if (pKicker) pKicker.textContent = (typeof seekSec === 'number') ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
@@ -549,16 +606,6 @@ document.addEventListener('play', function (e) {
     }
   });
   moreBtn.addEventListener('click', renderMore);
-  function stepTo(idx) {
-    if (idx < 0 || idx >= epList.length) return;
-    loadEpisode(epList[idx].date, null, false);
-    var url = new URL(location.href);
-    url.searchParams.set('ep', epList[idx].date);
-    url.searchParams.delete('t');
-    history.replaceState(null, '', url);
-  }
-  if (prevBtn) prevBtn.addEventListener('click', function () { stepTo(epIdx - 1); });
-  if (nextBtn) nextBtn.addEventListener('click', function () { stepTo(epIdx + 1); });
 
   function init(clipsData, epsData) {
     clips = clipsData.slice().sort(function (a, b) { return b.episodeDate.localeCompare(a.episodeDate) || a.startSec - b.startSec; });
@@ -567,13 +614,14 @@ document.addEventListener('play', function (e) {
       .sort(function (a, b) { return a.date.localeCompare(b.date); });
     if (!clips.length) { emptyMsg.hidden = false; return; }
     renderMore();
+    buildSheet();
     var q = new URLSearchParams(location.search);
     var ep = q.get('ep'), t = parseInt(q.get('t'), 10);
     if (ep && episodes[ep]) loadEpisode(ep, isNaN(t) ? 0 : t, false);
     else if (epList.length) {
       currentEp = epList[epList.length - 1].date;
       epIdx = epList.length - 1;
-      syncStepper();
+      syncPicker();
       var latest = epList[epList.length - 1];
       if (pTitle && latest.title) pTitle.textContent = latest.title;
     }

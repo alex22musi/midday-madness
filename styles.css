@@ -118,19 +118,48 @@ section h2 {
 }
 .show-more:hover { filter: brightness(1.08); }
 .clips-empty { text-align: center; color: var(--muted); }
-.ep-stepper {
-  display: flex; align-items: center; justify-content: center; gap: 1.1rem;
-  margin: 0.35rem 0 0.55rem;
+.player-sub { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; color: var(--muted); }
+
+/* P5 episode picker: All-episodes toggle + season-grouped sheet */
+.ep-picker { margin: 0.35rem 0 0.55rem; }
+.ep-allbtn {
+  width: 100%; padding: 0.62rem 0.8rem; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(245, 179, 1, 0.45); background: rgba(245, 179, 1, 0.07);
+  color: var(--gold); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center; gap: 0.45rem;
 }
-.ep-stepper button {
-  width: 32px; height: 32px; border-radius: 50%; flex: none;
-  border: 1px solid rgba(227, 168, 60, 0.45); background: transparent;
-  color: var(--gold); font-size: 1.05rem; line-height: 1; cursor: pointer;
+.ep-allbtn:hover { background: rgba(245, 179, 1, 0.14); }
+.ep-chev { display: inline-block; transition: transform 0.2s ease; font-size: 0.7rem; }
+.ep-allbtn.open .ep-chev { transform: rotate(180deg); }
+.ep-sheet {
+  margin-top: 0.6rem; border: 1px solid var(--line, rgba(255,255,255,.09)); border-radius: 12px;
+  overflow-y: auto; max-height: 372px; background: rgba(255,255,255,0.02);
+  scrollbar-width: thin; scrollbar-color: rgba(245,179,1,.4) transparent;
 }
-.ep-stepper button:hover:not(:disabled) { background: rgba(227, 168, 60, 0.15); }
-.ep-stepper button:disabled { opacity: 0.3; cursor: default; }
-.ep-cur { min-width: 132px; text-align: center; font-weight: 700; font-size: 0.92rem; line-height: 1.25; }
-.ep-cur small { display: block; color: var(--muted); font-weight: 500; font-size: 0.7rem; letter-spacing: 0.1em; }
+.ep-sheet::-webkit-scrollbar { width: 5px; }
+.ep-sheet::-webkit-scrollbar-thumb { background: rgba(245,179,1,.4); border-radius: 3px; }
+.ep-sheet::-webkit-scrollbar-track { background: transparent; }
+.ep-season {
+  padding: 0.55rem 0.85rem 0.3rem; font-size: 0.62rem; letter-spacing: 0.15em; font-weight: 800;
+  color: var(--gold); text-transform: uppercase;
+}
+.ep-row {
+  display: flex; align-items: center; gap: 0.65rem; width: 100%; text-align: left; cursor: pointer;
+  padding: 0.58rem 0.85rem; background: none; border: none; border-top: 1px solid rgba(255,255,255,0.06);
+  color: var(--ink, #e8eaf2); font: inherit;
+}
+.ep-row:hover { background: rgba(255,255,255,0.045); }
+.ep-row.now { background: rgba(245, 179, 1, 0.09); }
+.ep-badge {
+  flex: 0 0 auto; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em;
+  color: #131313; background: var(--muted); border-radius: 5px; padding: 0.2rem 0.36rem;
+}
+.ep-row.now .ep-badge { background: var(--gold); }
+.ep-rmain { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.08rem; }
+.ep-rdate { font-size: 0.64rem; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ep-rtitle { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ep-rtime { flex: 0 0 auto; font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ep-rplay { flex: 0 0 auto; color: var(--gold); font-size: 0.8rem; }
 
 /* ---------- about ---------- */
 .about { background: var(--navy-2); max-width: none; }
