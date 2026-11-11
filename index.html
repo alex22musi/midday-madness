@@ -21,7 +21,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://midday-madness.vercel.app/assets/og-card.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110n">
+<link rel="stylesheet" href="styles.css?v=20261111d">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -68,9 +68,17 @@
 
   <section id="clips" class="clips">
     <h2>LATEST CLIPS</h2>
-    <div class="clip-grid" id="clip-grid"></div>
+    <!-- Placeholder cards reserve the grid's space (same classes/sizes as real cards) so the page below never jumps when clips.json arrives; the script replaces them. -->
+    <div class="clip-grid" id="clip-grid" aria-busy="true" aria-hidden="true">
+      <article class="clip-card skel"><div class="clip-media"><div class="skel-media"></div></div><div class="clip-body"><h3>&nbsp;<br>&nbsp;</h3><p class="meta">&nbsp;</p><p class="blurb">&nbsp;</p></div><div class="strip-btn">&nbsp;</div></article>
+      <article class="clip-card skel"><div class="clip-media"><div class="skel-media"></div></div><div class="clip-body"><h3>&nbsp;<br>&nbsp;</h3><p class="meta">&nbsp;</p><p class="blurb">&nbsp;</p></div><div class="strip-btn">&nbsp;</div></article>
+      <article class="clip-card skel"><div class="clip-media"><div class="skel-media"></div></div><div class="clip-body"><h3>&nbsp;<br>&nbsp;</h3><p class="meta">&nbsp;</p><p class="blurb">&nbsp;</p></div><div class="strip-btn">&nbsp;</div></article>
+      <article class="clip-card skel"><div class="clip-media"><div class="skel-media"></div></div><div class="clip-body"><h3>&nbsp;<br>&nbsp;</h3><p class="meta">&nbsp;</p><p class="blurb">&nbsp;</p></div><div class="strip-btn">&nbsp;</div></article>
+      <article class="clip-card skel"><div class="clip-media"><div class="skel-media"></div></div><div class="clip-body"><h3>&nbsp;<br>&nbsp;</h3><p class="meta">&nbsp;</p><p class="blurb">&nbsp;</p></div><div class="strip-btn">&nbsp;</div></article>
+      <article class="clip-card skel"><div class="clip-media"><div class="skel-media"></div></div><div class="clip-body"><h3>&nbsp;<br>&nbsp;</h3><p class="meta">&nbsp;</p><p class="blurb">&nbsp;</p></div><div class="strip-btn">&nbsp;</div></article>
+    </div>
     <p class="clips-empty" id="clips-empty" hidden>Clips are on their way &mdash; check back after Wednesday&rsquo;s show.</p>
-    <button type="button" class="show-more" id="clips-more" hidden>Show more clips</button>
+    <button type="button" class="show-more is-pending" id="clips-more" hidden tabindex="-1" aria-hidden="true">Show more clips</button>
   </section>
 
   <section id="episode" class="episode">
@@ -725,12 +733,22 @@ document.addEventListener('play', function (e) {
   });
   moreBtn.addEventListener('click', renderMore);
 
+  function clearSkeleton() {
+    grid.innerHTML = '';
+    grid.removeAttribute('aria-busy');
+    grid.removeAttribute('aria-hidden');
+    moreBtn.classList.remove('is-pending');
+    moreBtn.removeAttribute('tabindex');
+    moreBtn.removeAttribute('aria-hidden');
+  }
+
   function init(clipsData, epsData) {
     clips = clipsData.slice().sort(function (a, b) { return b.episodeDate.localeCompare(a.episodeDate) || a.startSec - b.startSec; });
     epsData.forEach(function (ep) { episodes[ep.date] = ep; });
     epList = epsData.filter(function (ep) { return ep.audioFile; })
       .sort(function (a, b) { return a.date.localeCompare(b.date); });
-    if (!clips.length) { emptyMsg.hidden = false; return; }
+    if (!clips.length) { clearSkeleton(); emptyMsg.hidden = false; return; }
+    clearSkeleton();
     renderMore();
     buildSheet();
     var q = new URLSearchParams(location.search);
@@ -758,7 +776,7 @@ document.addEventListener('play', function (e) {
     fetch('data/clips.json').then(function (r) { return r.json(); }),
     fetch('data/episodes.json').then(function (r) { return r.json(); })
   ]).then(function (res) { init(res[0], res[1]); })
-    .catch(function () { emptyMsg.hidden = false; });
+    .catch(function () { clearSkeleton(); emptyMsg.hidden = false; });
 })();
 </script>
 </body>
