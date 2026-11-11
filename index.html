@@ -34,7 +34,7 @@
 <header class="nav">
   <div class="nav-inner">
     <a class="brand" href="#top">
-      <img src="assets/logo.jpg" alt="Midday Madness logo">
+      <img src="assets/logo-190.jpg" alt="Midday Madness logo">
       <span>MIDDAY MADNESS</span>
     </a>
     <nav>
@@ -59,7 +59,7 @@
     </div>
   </section>
   <section class="hero">
-    <img class="hero-logo" src="assets/logo.jpg" alt="Midday Madness logo">
+    <img class="hero-logo" src="assets/logo.jpg" srcset="assets/logo-190.jpg 190w, assets/logo-380.jpg 380w, assets/logo.jpg 640w" sizes="190px" width="190" height="190" alt="Midday Madness logo">
     <h1>MIDDAY MADNESS</h1>
     <p class="tagline">IU&rsquo;s loudest midday sports talk.</p>
     <p class="schedule">Every Wednesday at 1 PM &bull; WIUX 99.1 FM</p>
@@ -78,7 +78,7 @@
     <div class="player" id="player">
       <audio id="player-audio" preload="metadata" src="assets/episodes/ep-2026-11-04.m4a"></audio>
       <div class="player-head">
-        <img class="player-art" src="assets/logo.jpg" alt="Midday Madness logo">
+        <img class="player-art" src="assets/logo-190.jpg" alt="Midday Madness logo">
         <div class="player-meta">
           <span class="player-kicker" id="player-kicker">Latest episode</span>
           <span class="player-title" id="player-title">12. Nov 4, 2026 Midday Madness</span>
@@ -692,14 +692,14 @@ document.addEventListener('play', function (e) {
       if (!en.isIntersecting) return;
       var v = en.target;
       lazyIO.unobserve(v);
+      // Poster only: the video file is not requested until the viewer taps play (ensureSrc in wireClipControls).
       if (v.dataset.poster) v.poster = v.dataset.poster;
-      if (v.dataset.src) { v.src = v.dataset.src; v.preload = 'metadata'; }
     });
   }, { rootMargin: '600px' }) : null;
   function lazyWatch(scope) {
     scope.querySelectorAll('video[data-src]').forEach(function (v) {
       if (lazyIO) lazyIO.observe(v);
-      else { v.poster = v.dataset.poster || ''; v.src = v.dataset.src; }
+      else { v.poster = v.dataset.poster || ''; }
     });
   }
   function renderMore() {
