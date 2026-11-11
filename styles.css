@@ -156,7 +156,6 @@ section h2 {
 }
 .ep-row.now .ep-badge { background: var(--gold); }
 .ep-rmain { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 0.08rem; }
-.ep-rdate { font-size: 0.64rem; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .ep-rtitle { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ep-rtime { flex: 0 0 auto; font-size: 0.7rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .ep-rplay { flex: 0 0 auto; color: var(--gold); font-size: 0.8rem; }
@@ -304,7 +303,6 @@ img.host-photo {
 .player-speeds button.is-active { background: var(--gold); color: #1a1206; }
 .player-volume { display: flex; align-items: center; gap: 0.5rem; color: var(--muted); }
 .player-volume input[type="range"] { width: 96px; accent-color: var(--gold); cursor: pointer; }
-.player-hint { color: var(--muted); font-size: 0.9rem; margin-top: 1rem; }
 @media (max-width: 520px) {
   .player { padding: 1rem; }
   .player-volume { display: none; }
