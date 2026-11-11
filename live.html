@@ -298,7 +298,7 @@
     else if (st === 'awaiting-tap') statusEl.textContent = 'Tap to start listening live.';
     else if (st === 'connecting') statusEl.textContent = 'Connecting…';
     else if (st === 'reconnecting') statusEl.textContent = 'Reconnecting… (attempt ' + detail.attempt + ')';
-    else if (st === 'playing') statusEl.textContent = detail.buffering ? 'Buffering…' : 'You’re listening live.';
+    else if (st === 'playing') statusEl.textContent = detail.buffering ? 'Buffering…' : '';
     else if (st === 'paused') statusEl.textContent = 'Paused. Tap play to jump back in.';
     else if (st === 'setup') statusEl.textContent = detail.message || 'Stream not configured yet.';
     else if (st === 'error') statusEl.textContent = unsupported
