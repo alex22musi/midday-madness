@@ -199,6 +199,11 @@
     if (!opts.streamUrl && CONFIG.WIUX_STREAM_URL_FALLBACK &&
         CONFIG.WIUX_STREAM_URL_FALLBACK !== streamUrl) {
       streamUrls.push(CONFIG.WIUX_STREAM_URL_FALLBACK);
+      // The direct WIUX feed is the station's own (what wiux.org plays); the
+      // TuneIn relay can run behind and show automation music while the
+      // studio is live. Prefer direct everywhere except iOS, which can't
+      // decode HE-AAC and needs the MP3 relay first.
+      if (!isIOS()) streamUrls.reverse();
     }
 
     var S = {
