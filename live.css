@@ -205,7 +205,7 @@ body.live-now .livepage-hero {
 .seg-done .seg-title { text-decoration: line-through; }
 .seg-tag {
   margin-left: auto; flex: none;
-  font-size: 0.68rem; font-weight: 900; letter-spacing: 0.14em;
+  font-size: 0.72rem; font-weight: 900; letter-spacing: 0.14em;
   color: #ffb3b6; background: rgba(229, 72, 77, 0.16);
   border: 1px solid rgba(229, 72, 77, 0.5);
   padding: 0.25rem 0.7rem; border-radius: 999px;
@@ -294,7 +294,7 @@ body.live-now .livepage-hero {
 .seg-row:last-child { border-bottom: none; }
 .seg-row .seg-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .seg-row .pill {
-  flex: none; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em;
+  flex: none; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em;
   padding: 0.2rem 0.6rem; border-radius: 999px;
   background: rgba(244, 241, 232, 0.08); color: var(--muted);
 }

@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110c">
+<link rel="stylesheet" href="styles.css?v=20261110d">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -76,7 +76,7 @@
     <h2>FULL EPISODE</h2>
     <p class="episode-title" id="episode-heading">November 4, 2026 &mdash; the full episode</p>
     <div class="player" id="player">
-      <audio id="player-audio" preload="metadata" src="assets/full-show.m4a"></audio>
+      <audio id="player-audio" preload="metadata" src="assets/episodes/ep-2026-11-04.m4a"></audio>
       <div class="player-head">
         <img class="player-art" src="assets/logo.jpg" alt="Midday Madness logo">
         <div class="player-meta">
@@ -138,13 +138,13 @@
     football, the NFL, and IU sports &mdash; hot takes, debates, and zero chill, every Wednesday at 1 PM.</p>
     <div class="hosts">
       <div class="host">
-        <img class="host-photo" src="assets/alex-headshot.jpg" alt="Alex Musicus">
+        <img class="host-photo" loading="lazy" decoding="async" src="assets/alex-headshot.jpg" alt="Alex Musicus">
         <h3><a class="host-link" href="https://www.linkedin.com/in/alexander-musicus" target="_blank" rel="noopener">Alex Musicus</a></h3>
         <p class="role">Co-host</p>
         <p class="bio">Senior sports media student in The Media School at Indiana University, minoring in business at Kelley. He writes weekly college football takes for EnforceTheSport. In spring 2026, he interned at FanDuel Sports Network West, supporting Clippers, Kings, and Angels broadcasts.</p>
       </div>
       <div class="host">
-        <img class="host-photo" src="assets/sam-headshot.jpg" alt="Sam Singer">
+        <img class="host-photo" loading="lazy" decoding="async" src="assets/sam-headshot.jpg" alt="Sam Singer">
         <h3><a class="host-link" href="https://www.linkedin.com/in/samuelsinger1029" target="_blank" rel="noopener">Sam Singer</a></h3>
         <p class="role">Co-host</p>
         <p class="bio">Senior media and business student at Indiana University Bloomington. Previously interned at SNY and FanDuel Sports Network, working across sports media production and broadcast operations. He now serves as a sales executive at Campus Collective, connecting brands with college audiences nationwide.</p>
@@ -426,7 +426,7 @@
     var art = document.createElement('article');
     art.className = 'clip-card';
     art.innerHTML =
-      '<video controls playsinline preload="metadata" poster="' + esc(clip.poster) + '" src="' + esc(clip.file) + '"></video>' +
+       '<video controls playsinline preload="none" data-poster="' + esc(clip.poster) + '" data-src="' + esc(clip.file) + '"></video>' +
       '<div class="clip-body"><h3>' + esc(clip.title) + '</h3>' +
       '<p class="meta">' + esc(clip.episodeLabel) + ' &bull; ' + fmtDur(clip.durationSec) + '</p>' +
       '<p class="blurb">' + esc(clip.blurb || '') + '</p></div>' +
@@ -434,12 +434,28 @@
       ' aria-label="Play the ' + esc(clip.episodeLabel) + ' episode at ' + esc(clip.timestampLabel) + '">\u25B6 <span class="strip-long">HEAR IT IN THE EPISODE &middot; </span>' + esc(clip.timestampLabel) + '</button>';
     return art;
   }
+  var lazyIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var v = en.target;
+      lazyIO.unobserve(v);
+      if (v.dataset.poster) v.poster = v.dataset.poster;
+      if (v.dataset.src) { v.src = v.dataset.src; v.preload = 'metadata'; }
+    });
+  }, { rootMargin: '600px' }) : null;
+  function lazyWatch(scope) {
+    scope.querySelectorAll('video[data-src]').forEach(function (v) {
+      if (lazyIO) lazyIO.observe(v);
+      else { v.poster = v.dataset.poster || ''; v.src = v.dataset.src; }
+    });
+  }
   function renderMore() {
     var frag = document.createDocumentFragment();
     var next = Math.min(shown + PAGE, clips.length);
     for (var i = shown; i < next; i++) frag.appendChild(card(clips[i]));
     shown = next;
     grid.appendChild(frag);
+    lazyWatch(grid);
     moreBtn.hidden = shown >= clips.length;
   }
   grid.addEventListener('click', function (e) {
