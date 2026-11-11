@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110m">
+<link rel="stylesheet" href="styles.css?v=20261110n">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -127,6 +127,7 @@
           <input type="range" id="player-vol" min="0" max="100" value="100" aria-label="Volume">
         </label>
       </div>
+      <p class="player-error" id="player-error" hidden>Couldn&rsquo;t load this episode &mdash; check your connection. <button type="button" id="player-retry">Tap to retry</button></p>
     </div>
   </section>
 
@@ -380,6 +381,78 @@ document.addEventListener('play', function (e) {
 })();
 </script>
 <script>
+/* ---------- Phase 5 polish: lock-screen seek actions, loading/error states, keyboard ---------- */
+(function () {
+  var audio = document.getElementById('player-audio');
+  var player = document.getElementById('player');
+  var errEl = document.getElementById('player-error');
+  var retry = document.getElementById('player-retry');
+  if (!audio) return;
+
+  if ('mediaSession' in navigator) {
+    var setHandler = function (action, fn) { try { navigator.mediaSession.setActionHandler(action, fn); } catch (e) {} };
+    setHandler('play', function () { var p = audio.play(); if (p && p.catch) p.catch(function () {}); });
+    setHandler('pause', function () { audio.pause(); });
+    setHandler('seekbackward', function (d) { audio.currentTime = Math.max(0, audio.currentTime - ((d && d.seekOffset) || 10)); });
+    setHandler('seekforward', function (d) { if (audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + ((d && d.seekOffset) || 10)); });
+    setHandler('seekto', function (d) { if (d && typeof d.seekTime === 'number') { try { audio.currentTime = d.seekTime; } catch (e) {} } });
+    var lastPos = 0;
+    audio.addEventListener('timeupdate', function () {
+      var now = Date.now();
+      if (now - lastPos < 1000 || !audio.duration || !isFinite(audio.duration)) return;
+      lastPos = now;
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          playbackRate: audio.playbackRate,
+          position: Math.max(0, Math.min(audio.currentTime, audio.duration))
+        });
+      } catch (e) {}
+    });
+  }
+
+  function loading(on) { if (player) player.classList.toggle('is-loading', !!on); }
+  audio.addEventListener('waiting', function () { loading(true); });
+  audio.addEventListener('seeking', function () { loading(true); });
+  audio.addEventListener('playing', function () { loading(false); if (errEl) errEl.hidden = true; });
+  audio.addEventListener('canplay', function () { loading(false); });
+  audio.addEventListener('pause', function () { loading(false); });
+  audio.addEventListener('error', function () { loading(false); if (errEl) errEl.hidden = false; }, true);
+  if (retry) retry.addEventListener('click', function () {
+    if (errEl) errEl.hidden = true;
+    var t = audio.currentTime || 0;
+    try { audio.load(); } catch (e) {}
+    audio.addEventListener('loadedmetadata', function h() {
+      audio.removeEventListener('loadedmetadata', h);
+      try { audio.currentTime = t; } catch (e) {}
+      var p = audio.play(); if (p && p.catch) p.catch(function () {});
+    });
+  });
+
+  var playerVisible = true;
+  if ('IntersectionObserver' in window && player) {
+    playerVisible = false;
+    new IntersectionObserver(function (es) { playerVisible = es[0].isIntersecting; }, { threshold: 0.2 }).observe(player);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!playerVisible || e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (!t || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable) return;
+    if (t.id === 'player-bar') return; /* the scrub bar keeps its own arrow keys */
+    if (e.key === ' ' && t.tagName !== 'BUTTON' && t.tagName !== 'A') {
+      e.preventDefault();
+      if (audio.paused) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); } else audio.pause();
+    } else if (e.key === 'ArrowRight' && audio.duration) {
+      e.preventDefault();
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      audio.currentTime = Math.max(0, audio.currentTime - 10);
+    }
+  });
+})();
+</script>
+<script>
 /* ---------- Phase 1: data-driven clips grid + jump-to-moment ---------- */
 (function () {
   var PAGE = 6;
@@ -457,6 +530,18 @@ document.addEventListener('play', function (e) {
   function fmtDur(s) { var m = Math.floor(s / 60), ss = s % 60; return m + ':' + (ss < 10 ? '0' : '') + ss; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  function setEpMediaSession(title) {
+    if (!('mediaSession' in navigator) || !window.MediaMetadata) return;
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: title,
+        artist: 'Midday Madness \u00B7 WIUX 99.1 FM',
+        album: 'Midday Madness',
+        artwork: [{ src: new URL('assets/logo.jpg', location.href).href, sizes: '512x512', type: 'image/jpeg' }]
+      });
+    } catch (e) {}
+  }
+
   var loadToken = 0;
   function loadEpisode(date, seekSec, autoplay) {
     var ep = episodes[date];
@@ -479,6 +564,7 @@ document.addEventListener('play', function (e) {
     } catch (e) {}
     var label = ep.title || (ep.label + ' \u2014 the full episode');
     if (pTitle) pTitle.textContent = label;
+    setEpMediaSession(label);
     if (pKicker) pKicker.textContent = (typeof seekSec === 'number') ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
     if (isCurrent) { go(); }
     else {
@@ -623,6 +709,7 @@ document.addEventListener('play', function (e) {
       syncPicker();
       var latest = epList[epList.length - 1];
       if (pTitle && latest.title) pTitle.textContent = latest.title;
+      if (latest.title) setEpMediaSession(latest.title);
     }
   }
   Promise.all([
