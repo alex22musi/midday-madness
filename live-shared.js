@@ -265,22 +265,37 @@
         var nav = (typeof navigator !== 'undefined') ? navigator : {};
         if (!nav.mediaSession) return;
         if (!mediaSessionReady) {
+          // Artwork is resolved against the page's own origin so it loads from whichever host served the page.
           nav.mediaSession.metadata = new MediaMetadata({
             title: 'Midday Madness',
             artist: 'WIUX 99.1 FM',
             album: 'Live on WIUX 99.1 FM — Indiana University',
             artwork: [
-              { src: 'https://midday-madness.vercel.app/assets/logo.jpg', sizes: '512x512', type: 'image/jpeg' }
+              { src: new URL('assets/logo-380.jpg', location.href).href, sizes: '380x380', type: 'image/jpeg' },
+              { src: new URL('assets/logo.jpg', location.href).href, sizes: '640x640', type: 'image/jpeg' }
             ]
           });
           try { nav.mediaSession.setActionHandler('play', function () { play(); }); } catch (e) {}
           try { nav.mediaSession.setActionHandler('pause', function () { pause(); }); } catch (e) {}
+          // A live stream can't be stopped and resumed mid-show, so Stop behaves like Pause.
+          try { nav.mediaSession.setActionHandler('stop', function () { pause(); }); } catch (e) {}
           mediaSessionReady = true;
         }
       } catch (e) {}
     }
 
+    // Keep the lock screen's play/pause icon in step with the player.
+    function syncPlaybackState() {
+      try {
+        if (typeof navigator === 'undefined' || !navigator.mediaSession) return;
+        var st = S.state;
+        navigator.mediaSession.playbackState =
+          st === 'playing' || st === 'connecting' || st === 'reconnecting' ? 'playing' : 'paused';
+      } catch (e) {}
+    }
+
     function emit() {
+      syncPlaybackState();
       onState(S.state, {
         attempt: S.attempt,
         buffering: S.state === 'connecting' || S.state === 'reconnecting' || !!S._waiting,

@@ -391,26 +391,61 @@ document.addEventListener('play', function (e) {
   var retry = document.getElementById('player-retry');
   if (!audio) return;
 
-  if ('mediaSession' in navigator) {
+  /* Lock screen / Control Center (Media Session): one session for the whole page.
+     Whatever played last (the episode or a clip) owns the title, artwork and buttons, so a
+     clip never shows the episode's title and its pause button never pauses the wrong thing. */
+  var sessionOK = ('mediaSession' in navigator) && !!window.MediaMetadata;
+  var epTitle = null;      // title of the selected episode (set by the episode script)
+  var activeMedia = null;  // the <audio>/<video> that currently owns the session
+  function sessionArtwork() {
+    function u(path) { return new URL(path, location.href).href; }
+    return [
+      { src: u('assets/logo-380.jpg'), sizes: '380x380', type: 'image/jpeg' },
+      { src: u('assets/logo.jpg'), sizes: '640x640', type: 'image/jpeg' }
+    ];
+  }
+  function setSessionMeta(title, artist) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: title, artist: artist, album: 'Midday Madness', artwork: sessionArtwork() });
+    } catch (e) {}
+  }
+  function showEpisodeMeta() { if (epTitle) setSessionMeta(epTitle, 'Midday Madness \u00B7 WIUX 99.1 FM'); }
+  function claimSession(el) {
+    activeMedia = el;
+    if (el === audio) { showEpisodeMeta(); return; }
+    var card = el.closest ? el.closest('.clip-card') : null;
+    var h = card && card.querySelector('h3'), m = card && card.querySelector('.meta');
+    var label = m ? m.textContent.split('\u2022')[0].trim() : '';
+    setSessionMeta(h ? h.textContent : 'Midday Madness clip', 'Midday Madness \u00B7 ' + (label || 'WIUX 99.1 FM'));
+  }
+  function setSessionState(s) { try { navigator.mediaSession.playbackState = s; } catch (e) {} }
+  window.MM_session = {
+    setEpisodeTitle: function (title) { epTitle = title; if (sessionOK && (!activeMedia || activeMedia === audio)) showEpisodeMeta(); }
+  };
+  if (sessionOK) {
+    var cur = function () { return activeMedia || audio; };
     var setHandler = function (action, fn) { try { navigator.mediaSession.setActionHandler(action, fn); } catch (e) {} };
-    setHandler('play', function () { var p = audio.play(); if (p && p.catch) p.catch(function () {}); });
-    setHandler('pause', function () { audio.pause(); });
-    setHandler('seekbackward', function (d) { audio.currentTime = Math.max(0, audio.currentTime - ((d && d.seekOffset) || 10)); });
-    setHandler('seekforward', function (d) { if (audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + ((d && d.seekOffset) || 10)); });
-    setHandler('seekto', function (d) { if (d && typeof d.seekTime === 'number') { try { audio.currentTime = d.seekTime; } catch (e) {} } });
+    setHandler('play', function () { var p = cur().play(); if (p && p.catch) p.catch(function () {}); });
+    setHandler('pause', function () { cur().pause(); });
+    setHandler('seekbackward', function (d) { var a = cur(); a.currentTime = Math.max(0, a.currentTime - ((d && d.seekOffset) || 10)); });
+    setHandler('seekforward', function (d) { var a = cur(); if (a.duration) a.currentTime = Math.min(a.duration, a.currentTime + ((d && d.seekOffset) || 10)); });
+    setHandler('seekto', function (d) { var a = cur(); if (d && typeof d.seekTime === 'number') { try { a.currentTime = d.seekTime; } catch (e) {} } });
+    function ours(t) { return t === audio || (t && t.tagName === 'VIDEO' && t.closest && t.closest('.clip-card')); }
+    /* Media events don't bubble, but a capturing listener on document sees every <audio>/<video>. */
+    document.addEventListener('play', function (e) { if (ours(e.target)) { claimSession(e.target); setSessionState('playing'); } }, true);
+    document.addEventListener('pause', function (e) { if (e.target === activeMedia) setSessionState('paused'); }, true);
+    document.addEventListener('ended', function (e) { if (e.target === activeMedia) setSessionState('paused'); }, true);
     var lastPos = 0;
-    audio.addEventListener('timeupdate', function () {
+    document.addEventListener('timeupdate', function (e) {
+      var a = e.target;
+      if (a !== activeMedia) return;
       var now = Date.now();
-      if (now - lastPos < 1000 || !audio.duration || !isFinite(audio.duration)) return;
+      if (now - lastPos < 1000 || !a.duration || !isFinite(a.duration)) return;
       lastPos = now;
       try {
-        navigator.mediaSession.setPositionState({
-          duration: audio.duration,
-          playbackRate: audio.playbackRate,
-          position: Math.max(0, Math.min(audio.currentTime, audio.duration))
-        });
-      } catch (e) {}
-    });
+        navigator.mediaSession.setPositionState({ duration: a.duration, playbackRate: a.playbackRate, position: Math.max(0, Math.min(a.currentTime, a.duration)) });
+      } catch (e2) {}
+    }, true);
   }
 
   function loading(on) { if (player) player.classList.toggle('is-loading', !!on); }
@@ -533,15 +568,7 @@ document.addEventListener('play', function (e) {
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
   function setEpMediaSession(title) {
-    if (!('mediaSession' in navigator) || !window.MediaMetadata) return;
-    try {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: title,
-        artist: 'Midday Madness \u00B7 WIUX 99.1 FM',
-        album: 'Midday Madness',
-        artwork: [{ src: new URL('assets/logo.jpg', location.href).href, sizes: '512x512', type: 'image/jpeg' }]
-      });
-    } catch (e) {}
+    if (window.MM_session) window.MM_session.setEpisodeTitle(title);
   }
 
   var loadToken = 0;
