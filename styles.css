@@ -525,3 +525,6 @@ footer {
   .arch-row { flex-wrap: wrap; }
   .arch-play { margin-left: 64px; }
 }
+
+/* Scrolls to the player should clear the sticky header */
+.player { scroll-margin-top: 84px; }
