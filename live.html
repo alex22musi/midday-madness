@@ -15,7 +15,7 @@
 <meta property="og:url" content="https://alex22musi.github.io/midday-madness/live.html">
 <meta property="og:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
 <link rel="stylesheet" href="styles.css?v=20261110a">
-<link rel="stylesheet" href="live.css?v=20261110d">
+<link rel="stylesheet" href="live.css?v=20261110e">
 </head>
 <body>
 <header class="nav">
@@ -506,6 +506,29 @@
         });
     }
   }
+})();
+</script>
+<script>
+// Fade the big clock hero out as the page scrolls, so the giant numbers
+// never slide under the sticky header and clip.
+(function () {
+  var hero = document.querySelector('.livepage-hero');
+  if (!hero) return;
+  var ticking = false;
+  function apply() {
+    ticking = false;
+    var h = hero.offsetHeight || 320;
+    var fadeEnd = Math.max(120, h * 0.6);
+    var y = window.scrollY || window.pageYOffset || 0;
+    var o = y <= 0 ? 1 : Math.max(0, 1 - y / fadeEnd);
+    hero.style.opacity = o.toFixed(3);
+    hero.style.pointerEvents = o < 0.05 ? 'none' : '';
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+  }, { passive: true });
+  window.addEventListener('resize', apply);
+  apply();
 })();
 </script>
 </body>

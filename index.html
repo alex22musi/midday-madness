@@ -289,6 +289,20 @@
 })();
 </script>
 <script>
+// One sound at a time: whenever any clip or the episode player starts,
+// pause everything else on the page so two streams never overlap.
+document.addEventListener('play', function (e) {
+  var started = e.target;
+  if (!started || (started.tagName !== 'AUDIO' && started.tagName !== 'VIDEO')) return;
+  var media = document.querySelectorAll('audio, video');
+  for (var i = 0; i < media.length; i++) {
+    if (media[i] !== started && !media[i].paused) {
+      try { media[i].pause(); } catch (err) {}
+    }
+  }
+}, true);
+</script>
+<script>
 (function () {
   var audio = document.getElementById('player-audio');
   var toggle = document.getElementById('player-toggle');

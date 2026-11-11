@@ -20,6 +20,7 @@ body.countdown-only main { padding-bottom: 3rem; }
   max-width: none;
   padding: 3.5rem 1.2rem 2.5rem;
   text-align: center;
+  will-change: opacity;
   background:
     radial-gradient(ellipse 65% 90% at 50% 0%, rgba(227, 168, 60, 0.13), transparent 70%),
     linear-gradient(180deg, #10162a 0%, var(--navy) 100%);
