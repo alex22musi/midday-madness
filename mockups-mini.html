@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mini-player mockups — Midday Madness</title>
+<style>
+  :root { --navy:#0a0e1c; --navy-2:#10162a; --gold:#e3a83c; --gold-soft:#f2c66d; --text:#f4f1e8; --muted:#a9aec2; --card:#141b31; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--navy); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  header { max-width:1100px; margin:0 auto; padding:28px 20px 4px; }
+  header h1 { font-size:24px; margin:0 0 6px; letter-spacing:.02em; }
+  header p { color:var(--muted); margin:0 0 4px; font-size:15px; line-height:1.5; max-width:720px; }
+  header p b { color:var(--text); }
+  .row { max-width:1100px; margin:0 auto; padding:18px 20px 40px; display:flex; flex-wrap:wrap; gap:28px; }
+  .mock { width:340px; }
+  .mock h2 { font-size:17px; margin:0 0 2px; }
+  .mock h2 .tag { color:var(--gold); }
+  .mock .desc { color:var(--muted); font-size:13.5px; line-height:1.5; margin:0 0 10px; min-height:60px; }
+  .frame { position:relative; height:520px; border:1px solid #26304f; border-radius:22px; overflow:hidden; background:var(--navy-2); }
+  .page { position:absolute; inset:0; padding:14px 14px 90px; overflow:hidden; }
+  .page .hero { background:linear-gradient(160deg,#182242,#0d1330); border-radius:14px; padding:16px; text-align:center; }
+  .page .hero img { width:54px; height:54px; border-radius:10px; }
+  .page .hero .t { font-weight:800; letter-spacing:.06em; margin-top:8px; font-size:15px; }
+  .page .hero .s { color:var(--muted); font-size:12px; margin-top:2px; }
+  .page h4 { font-size:12px; letter-spacing:.14em; color:var(--gold); margin:16px 0 8px; }
+  .clip { background:var(--card); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+  .clip .ct { font-size:13.5px; font-weight:600; }
+  .clip .cm { color:var(--muted); font-size:11.5px; margin-top:2px; }
+  .reset { position:absolute; top:10px; right:10px; z-index:5; background:rgba(10,14,28,.85); color:var(--gold-soft); border:1px solid #33406b; border-radius:999px; font-size:11.5px; padding:5px 10px; cursor:pointer; }
+  button { font-family:inherit; }
+  .pp { display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; background:var(--gold); color:#1a1206; border-radius:50%; flex:0 0 auto; }
+  .pp svg { display:block; }
+  .x { background:none; border:none; color:var(--muted); cursor:pointer; font-size:17px; line-height:1; padding:6px; flex:0 0 auto; }
+  .ttl { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sub { color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* M1 — slim bar */
+  .m1 { position:absolute; left:0; right:0; bottom:0; background:rgba(13,18,38,.97); border-top:1px solid #26304f; padding:8px 10px calc(8px + env(safe-area-inset-bottom)); display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .m1 .prog { position:absolute; top:-1px; left:0; height:2px; background:var(--gold); width:32%; }
+  .m1 img { width:38px; height:38px; border-radius:8px; flex:0 0 auto; }
+  .m1 .mid { flex:1 1 auto; min-width:0; }
+  .m1 .ttl { font-size:13.5px; }
+  .m1 .sub { font-size:11.5px; }
+  .m1 .pp { width:40px; height:40px; }
+
+  /* M2 — floating card */
+  .m2 { position:absolute; left:10px; right:10px; bottom:calc(10px + env(safe-area-inset-bottom)); background:#171f3d; border:1px solid #2c3860; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.5); padding:10px 12px; }
+  .m2 .top { display:flex; align-items:center; gap:10px; }
+  .m2 img { width:44px; height:44px; border-radius:10px; flex:0 0 auto; }
+  .m2 .mid { flex:1 1 auto; min-width:0; }
+  .m2 .ttl { font-size:14px; }
+  .m2 .sub { font-size:12px; }
+  .m2 .pp { width:42px; height:42px; }
+  .m2 .track { height:4px; border-radius:2px; background:#26304f; margin-top:10px; overflow:hidden; }
+  .m2 .fill { height:100%; background:var(--gold); width:32%; border-radius:2px; }
+  .m2 .times { display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-top:4px; }
+
+  /* M3 — full controls */
+  .m3 { position:absolute; left:0; right:0; bottom:0; background:rgba(13,18,38,.98); border-top:1px solid #26304f; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); }
+  .m3 .top { display:flex; align-items:center; gap:10px; }
+  .m3 img { width:40px; height:40px; border-radius:8px; flex:0 0 auto; }
+  .m3 .mid { flex:1 1 auto; min-width:0; }
+  .m3 .ttl { font-size:13.5px; }
+  .m3 .sub { font-size:11.5px; }
+  .m3 .ctl { display:flex; align-items:center; gap:6px; margin-top:8px; }
+  .m3 .pp { width:44px; height:44px; }
+  .m3 .skip { background:none; border:none; color:var(--text); cursor:pointer; padding:6px; }
+  .m3 input[type=range] { flex:1 1 auto; accent-color:var(--gold); }
+  .m3 .tm { color:var(--muted); font-size:11.5px; min-width:74px; text-align:right; }
+  .note { max-width:1100px; margin:0 auto; padding:0 20px 34px; color:var(--muted); font-size:13.5px; line-height:1.55; }
+  .note b { color:var(--gold-soft); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mini-player — pick one</h1>
+  <p>The bar that follows you when an episode is playing and you scroll away from the player. All three are live demos: hit play, watch it tick, close it, reset it. Same behavior rules for whichever you pick — appears only after an episode starts, tap (outside the buttons) jumps back to the full player, close stops the episode.</p>
+  <p><b>Timing:</b> this ships <b>after Nov 13</b>, per your call. Tonight is just the pick.</p>
+</header>
+<div class="row">
+
+  <div class="mock">
+    <h2><span class="tag">M1</span> — Slim bar</h2>
+    <p class="desc">The quiet one. Thin bar pinned to the very bottom: logo, title, play/pause, close, progress as a hairline on its top edge. Least screen taken, fastest to build, matches your "super simple" rule for the player.</p>
+    <div class="frame">
+      <div class="page" id="page1"></div>
+      <button class="reset" data-reset="m1" hidden>Show bar again</button>
+      <div class="m1" id="m1">
+        <div class="prog"></div>
+        <img src="assets/logo.jpg" alt="">
+        <div class="mid"><div class="ttl">10. Nov 4, 2026 Midday Madness</div><div class="sub">18:24 / 55:38</div></div>
+        <button class="pp" data-pp aria-label="Play or pause"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path class="ic" d="M8 5v14l11-7z"/></svg></button>
+        <button class="x" data-x aria-label="Close mini player">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock">
+    <h2><span class="tag">M2</span> — Floating card</h2>
+    <p class="desc">The app-like one. A rounded card floating above the bottom edge with its own progress bar and times. More presence, reads as "now playing," easiest to hit with a thumb. Takes a bit more screen than M1.</p>
+    <div class="frame">
+      <div class="page" id="page2"></div>
+      <button class="reset" data-reset="m2" hidden>Show bar again</button>
+      <div class="m2" id="m2">
+        <div class="top">
+          <img src="assets/logo.jpg" alt="">
+          <div class="mid"><div class="ttl">10. Nov 4, 2026 Midday Madness</div><div class="sub">Fall 2026 &middot; Episode 10 of 10</div></div>
+          <button class="pp" data-pp aria-label="Play or pause"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><path class="ic" d="M8 5v14l11-7z"/></svg></button>
+          <button class="x" data-x aria-label="Close mini player">&times;</button>
+        </div>
+        <div class="track"><div class="fill"></div></div>
+        <div class="times"><span class="cur">18:24</span><span>55:38</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mock">
+    <h2><span class="tag">M3</span> — Full controls</h2>
+    <p class="desc">The power one. Bar with the works: seek slider, &minus;15/+30 skips, times. You basically never need to scroll back to the player. Tallest of the three, most chrome, most code.</p>
+    <div class="frame">
+      <div class="page" id="page3"></div>
+      <button class="reset" data-reset="m3" hidden>Show bar again</button>
+      <div class="m3" id="m3">
+        <div class="top">
+          <img src="assets/logo.jpg" alt="">
+          <div class="mid"><div class="ttl">10. Nov 4, 2026 Midday Madness</div><div class="sub">Fall 2026 &middot; Episode 10 of 10</div></div>
+          <button class="x" data-x aria-label="Close mini player">&times;</button>
+        </div>
+        <div class="ctl">
+          <button class="skip" data-skip="-15" aria-label="Back 15 seconds"><svg viewBox="0 0 48 48" width="24" height="24"><path d="M24 9a15 15 0 1 0 15 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M26 2l-11 7 11 7z" fill="currentColor"/><text x="24" y="31" text-anchor="middle" font-size="12" font-weight="800" fill="currentColor">15</text></svg></button>
+          <button class="pp" data-pp aria-label="Play or pause"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path class="ic" d="M8 5v14l11-7z"/></svg></button>
+          <button class="skip" data-skip="30" aria-label="Forward 30 seconds"><svg viewBox="0 0 48 48" width="24" height="24"><path d="M24 9a15 15 0 1 1-15 15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M22 2l11 7-11 7z" fill="currentColor"/><text x="24" y="31" text-anchor="middle" font-size="12" font-weight="800" fill="currentColor">30</text></svg></button>
+          <input type="range" min="0" max="1000" value="330" aria-label="Seek">
+          <span class="tm">18:24 / 55:38</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<p class="note"><b>My take:</b> M1. It does the one job — never lose the controls — with the least fuss, and it's the closest to how you like the player: simple, tight, nothing extra. M2 if you want it to feel more like a podcast app. M3 only if you think people will actually scrub from the bar.</p>
+<script>
+  var pageHTML = '<div class="hero"><img src="assets/logo.jpg" alt=""><div class="t">MIDDAY MADNESS</div><div class="s">Every Wednesday at 1 PM &middot; WIUX 99.1 FM</div></div>' +
+    '<h4>LATEST CLIPS</h4>' +
+    '<div class="clip"><div class="ct">Don&rsquo;t Spend? Sell the Team</div><div class="cm">Nov 4, 2026 &middot; 0:42</div></div>' +
+    '<div class="clip"><div class="ct">Hoover on a Short Rope?</div><div class="cm">Nov 4, 2026 &middot; 0:55</div></div>' +
+    '<div class="clip"><div class="ct">Take the Couch Saturday</div><div class="cm">Nov 4, 2026 &middot; 0:44</div></div>' +
+    '<div class="clip"><div class="ct">Ryan Day Feels the Heat</div><div class="cm">Sep 16, 2026 &middot; 0:48</div></div>';
+  ['page1', 'page2', 'page3'].forEach(function (id) { document.getElementById(id).innerHTML = pageHTML; });
+
+  var DUR = 3338, PLAY = 'M8 5v14l11-7z', PAUSE = 'M6 5h4v14H6zM14 5h4v14h-4z';
+  function fmt(s) { s = Math.floor(s); var m = Math.floor(s / 60); return m + ':' + ('0' + (s % 60)).slice(-2); }
+  function wire(id) {
+    var bar = document.getElementById(id);
+    var btn = bar.querySelector('[data-pp]');
+    var icon = btn.querySelector('.ic');
+    var t = 1104, playing = false, timer = null;
+    function render() {
+      var pct = (t / DUR) * 100;
+      var prog = bar.querySelector('.prog'); if (prog) prog.style.width = pct + '%';
+      var fill = bar.querySelector('.fill'); if (fill) fill.style.width = pct + '%';
+      var range = bar.querySelector('input[type=range]'); if (range && document.activeElement !== range) range.value = Math.round(pct * 10);
+      bar.querySelectorAll('.sub, .tm, .cur').forEach(function (el) {
+        if (el.classList.contains('sub') && id === 'm1') el.textContent = fmt(t) + ' / ' + fmt(DUR);
+        if (el.classList.contains('tm')) el.textContent = fmt(t) + ' / ' + fmt(DUR);
+        if (el.classList.contains('cur')) el.textContent = fmt(t);
+      });
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      playing = !playing;
+      icon.setAttribute('d', playing ? PAUSE : PLAY);
+      if (playing) timer = setInterval(function () { t = Math.min(DUR, t + 1); render(); }, 250);
+      else clearInterval(timer);
+    });
+    var x = bar.querySelector('[data-x]');
+    x.addEventListener('click', function (e) {
+      e.stopPropagation();
+      playing = false; clearInterval(timer); icon.setAttribute('d', PLAY);
+      bar.style.display = 'none';
+      document.querySelector('[data-reset="' + id + '"]').hidden = false;
+    });
+    bar.querySelectorAll('[data-skip]').forEach(function (s) {
+      s.addEventListener('click', function (e) { e.stopPropagation(); t = Math.max(0, Math.min(DUR, t + (+s.getAttribute('data-skip')))); render(); });
+    });
+    var range = bar.querySelector('input[type=range]');
+    if (range) range.addEventListener('input', function () { t = DUR * range.value / 1000; render(); });
+    document.querySelector('[data-reset="' + id + '"]').addEventListener('click', function () {
+      bar.style.display = ''; this.hidden = true;
+    });
+    render();
+  }
+  wire('m1'); wire('m2'); wire('m3');
+</script>
+</body>
+</html>
