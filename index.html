@@ -397,11 +397,14 @@
   function fmtDur(s) { var m = Math.floor(s / 60), ss = s % 60; return m + ':' + (ss < 10 ? '0' : '') + ss; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
+  var loadToken = 0;
   function loadEpisode(date, seekSec, autoplay) {
     var ep = episodes[date];
     if (!ep || !ep.audioFile) return false;
     var isCurrent = currentEp === date && audio.src.indexOf(ep.audioFile) !== -1;
+    var token = ++loadToken;
     function go() {
+      if (token !== loadToken) return; // a newer switch superseded this one
       if (typeof seekSec === 'number') { try { audio.currentTime = seekSec; } catch (e) {} }
       if (autoplay) { var p = audio.play(); if (p && p.catch) p.catch(function () {}); }
     }
@@ -411,9 +414,16 @@
     var label = ep.label + ' \u2014 the full episode';
     if (heading) heading.textContent = label;
     if (pTitle) pTitle.textContent = label;
-    if (pKicker) pKicker.textContent = (seekSec != null) ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
+    if (pKicker) pKicker.textContent = (typeof seekSec === 'number') ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
     if (isCurrent) { go(); }
     else {
+      // Reset the readouts immediately so a slow load never shows the old episode's times.
+      var curEl = document.getElementById('player-current');
+      var durEl = document.getElementById('player-duration');
+      var progEl = document.getElementById('player-progress');
+      if (curEl) curEl.textContent = '0:00';
+      if (durEl) durEl.textContent = '--:--';
+      if (progEl) progEl.style.width = '0%';
       audio.src = ep.audioFile;
       if (audio.readyState >= 1) go();
       else audio.addEventListener('loadedmetadata', function h() { audio.removeEventListener('loadedmetadata', h); go(); });
@@ -471,8 +481,16 @@
     }
   });
   moreBtn.addEventListener('click', renderMore);
-  if (prevBtn) prevBtn.addEventListener('click', function () { if (epIdx > 0) loadEpisode(epList[epIdx - 1].date, 0, false); });
-  if (nextBtn) nextBtn.addEventListener('click', function () { if (epIdx < epList.length - 1) loadEpisode(epList[epIdx + 1].date, 0, false); });
+  function stepTo(idx) {
+    if (idx < 0 || idx >= epList.length) return;
+    loadEpisode(epList[idx].date, null, false);
+    var url = new URL(location.href);
+    url.searchParams.set('ep', epList[idx].date);
+    url.searchParams.delete('t');
+    history.replaceState(null, '', url);
+  }
+  if (prevBtn) prevBtn.addEventListener('click', function () { stepTo(epIdx - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { stepTo(epIdx + 1); });
 
   function init(clipsData, epsData) {
     clips = clipsData.slice().sort(function (a, b) { return b.episodeDate.localeCompare(a.episodeDate) || a.startSec - b.startSec; });
