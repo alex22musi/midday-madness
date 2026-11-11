@@ -201,9 +201,10 @@
       streamUrls.push(CONFIG.WIUX_STREAM_URL_FALLBACK);
       // The direct WIUX feed is the station's own (what wiux.org plays); the
       // TuneIn relay can run behind and show automation music while the
-      // studio is live. Prefer direct everywhere except iOS, which can't
-      // decode HE-AAC and needs the MP3 relay first.
-      if (!isIOS()) streamUrls.reverse();
+      // studio is live. Modern iOS Safari plays the direct feed fine
+      // (verified in the iOS simulator), so it goes first everywhere and
+      // the MP3 relay is only the fallback.
+      streamUrls.reverse();
     }
 
     var S = {
@@ -236,10 +237,9 @@
 
     /* ---- stream format support + iOS lock-screen integration ---- */
 
-    // The station's direct feed is HE-AAC (audio/aacp), which iOS Safari
-    // cannot decode in an <audio> element — so ask the browser up front
-    // instead of failing silently after the tap. MP3 needs no pre-check:
-    // every iPhone plays it.
+    // The station's direct feed is HE-AAC (audio/aacp). Older iOS builds
+    // couldn't decode it in an <audio> element, so ask the browser up front
+    // instead of failing silently after the tap. MP3 needs no pre-check.
     function streamFormatSupported() {
       try {
         if (typeof document === 'undefined' || !document.createElement) return true;
