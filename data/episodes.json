@@ -82,10 +82,10 @@
   {
     "date": "2026-10-07",
     "label": "Oct 7, 2026",
-    "title": null,
+    "title": "The October 7 Show",
     "description": null,
-    "durationSec": null,
-    "audioFile": null,
+    "durationSec": 3361,
+    "audioFile": "assets/episodes/ep-2026-10-07.mp3",
     "clips": []
   },
   {
