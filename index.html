@@ -79,7 +79,7 @@
         <img class="player-art" src="assets/logo.jpg" alt="Midday Madness logo">
         <div class="player-meta">
           <span class="player-kicker" id="player-kicker">Latest episode</span>
-          <span class="player-title" id="player-title">November 4, 2026 &mdash; the full episode</span>
+          <span class="player-title" id="player-title">10. Nov 4, 2026 Midday Madness</span>
         </div>
       </div>
       <div class="ep-stepper" id="ep-stepper">
@@ -421,7 +421,7 @@ document.addEventListener('play', function (e) {
     currentEp = date;
     epIdx = epList.findIndex(function (e) { return e.date === date; });
     syncStepper();
-    var label = ep.label + ' \u2014 the full episode';
+    var label = ep.title || (ep.label + ' \u2014 the full episode');
     if (pTitle) pTitle.textContent = label;
     if (pKicker) pKicker.textContent = (typeof seekSec === 'number') ? 'Jumped to ' + fmtDur(seekSec) + ' from a clip' : 'Full episode';
     if (isCurrent) { go(); }
@@ -574,6 +574,8 @@ document.addEventListener('play', function (e) {
       currentEp = epList[epList.length - 1].date;
       epIdx = epList.length - 1;
       syncStepper();
+      var latest = epList[epList.length - 1];
+      if (pTitle && latest.title) pTitle.textContent = latest.title;
     }
   }
   Promise.all([

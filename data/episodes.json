@@ -2,7 +2,7 @@
   {
     "date": "2025-10-01",
     "label": "Oct 1, 2025",
-    "title": "Where It Started",
+    "title": "1. Oct 1, 2025 Midday Madness",
     "description": "The earliest episode in the archive — Fall 2025 on WIUX 99.1.",
     "durationSec": 3417,
     "audioFile": "assets/episodes/ep-2025-10-01.mp3",
@@ -11,7 +11,7 @@
   {
     "date": "2025-10-15",
     "label": "Oct 15, 2025",
-    "title": "Mid-October Madness",
+    "title": "2. Oct 15, 2025 Midday Madness",
     "description": "Mid-October football talk from the Fall 2025 season.",
     "durationSec": 3441,
     "audioFile": "assets/episodes/ep-2025-10-15.mp3",
@@ -20,7 +20,7 @@
   {
     "date": "2025-10-22",
     "label": "Oct 22, 2025",
-    "title": "The October Stretch",
+    "title": "3. Oct 22, 2025 Midday Madness",
     "description": "The heart of the Fall 2025 season on Midday Madness.",
     "durationSec": 3548,
     "audioFile": "assets/episodes/ep-2025-10-22.mp3",
@@ -29,7 +29,7 @@
   {
     "date": "2025-10-29",
     "label": "Oct 29, 2025",
-    "title": "Halloween Week",
+    "title": "4. Oct 29, 2025 Midday Madness",
     "description": "The Halloween-week show, Fall 2025.",
     "durationSec": 3624,
     "audioFile": "assets/episodes/ep-2025-10-29.mp3",
@@ -38,7 +38,7 @@
   {
     "date": "2025-11-05",
     "label": "Nov 5, 2025",
-    "title": "Into November",
+    "title": "5. Nov 5, 2025 Midday Madness",
     "description": "November football arrives — Fall 2025 on WIUX.",
     "durationSec": 3688,
     "audioFile": "assets/episodes/ep-2025-11-05.mp3",
@@ -47,7 +47,7 @@
   {
     "date": "2025-11-12",
     "label": "Nov 12, 2025",
-    "title": "The Stretch Run",
+    "title": "6. Nov 12, 2025 Midday Madness",
     "description": "The late-season stretch, Fall 2025.",
     "durationSec": 3500,
     "audioFile": "assets/episodes/ep-2025-11-12.mp3",
@@ -56,7 +56,7 @@
   {
     "date": "2026-09-16",
     "label": "Sep 16, 2026",
-    "title": null,
+    "title": "7. Sep 16, 2026 Midday Madness",
     "description": null,
     "durationSec": 3219,
     "audioFile": "assets/episodes/ep-2026-09-16.m4a",
@@ -69,7 +69,7 @@
   {
     "date": "2026-09-23",
     "label": "Sep 23, 2026",
-    "title": null,
+    "title": "8. Sep 23, 2026 Midday Madness",
     "description": null,
     "durationSec": 3401,
     "audioFile": "assets/episodes/ep-2026-09-23.m4a",
@@ -82,7 +82,7 @@
   {
     "date": "2026-10-07",
     "label": "Oct 7, 2026",
-    "title": "The October 7 Show",
+    "title": "9. Oct 7, 2026 Midday Madness",
     "description": null,
     "durationSec": 3361,
     "audioFile": "assets/episodes/ep-2026-10-07.mp3",
@@ -109,7 +109,7 @@
   {
     "date": "2026-11-04",
     "label": "Nov 4, 2026",
-    "title": null,
+    "title": "10. Nov 4, 2026 Midday Madness",
     "description": null,
     "durationSec": 3338,
     "audioFile": "assets/episodes/ep-2026-11-04.m4a",
