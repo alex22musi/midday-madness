@@ -35,7 +35,7 @@
     SHOW_WEEKDAY: 'Wed',          // Intl weekday short name in SHOW_TZ
     SHOW_START_MIN: 13 * 60,      // 1:00 PM ET
     SHOW_END_MIN: 14 * 60,        // 2:00 PM ET
-    SITE_URL: 'https://alex22musi.github.io/midday-madness'
+    SITE_URL: 'https://midday-madness.vercel.app'
   };
 
   // Static rundown used when no realtime backend is configured (or before
@@ -265,7 +265,7 @@
             artist: 'WIUX 99.1 FM',
             album: 'Live on WIUX 99.1 FM — Indiana University',
             artwork: [
-              { src: 'https://alex22musi.github.io/midday-madness/assets/logo.jpg', sizes: '512x512', type: 'image/jpeg' }
+              { src: 'https://midday-madness.vercel.app/assets/logo.jpg', sizes: '512x512', type: 'image/jpeg' }
             ]
           });
           try { nav.mediaSession.setActionHandler('play', function () { play(); }); } catch (e) {}
