@@ -1,28 +1,30 @@
 # Caching review (Phase 4.5, issue #6)
 
 **Goal from the issue:** aggressive caching that can never serve a stale live page on show day.
-**Short answer:** the site is already served fresh by the host that matters; one small, safe header rule is added for media and images; fingerprinted filenames and a service worker are **not** worth it. Reasons below.
+**Short answer:** the site is already served fresh by Vercel, which is the primary host; one small, safe header rule is added for media and images; fingerprinted filenames and a service worker are **not** worth it. Reasons below.
 
 Measured Wed Nov 11, 2026 with `curl -I`.
 
-## Two hosts, same content
+## Two hosts, same content (Vercel is primary)
+
+Ryan confirmed on Nov 11, 2026 that **Vercel is the host going forward**; GitHub Pages is only a mirror.
 
 `index.html`, `live.html`, `styles.css`, `live-shared.js` and both JSON files are byte-identical on both hosts and match `main`.
 
 | | Vercel (`midday-madness.vercel.app`) | GitHub Pages (`alex22musi.github.io/midday-madness`) |
 |---|---|---|
-| Role | Canonical: the repo's share links, `og:` tags and lock-screen artwork point here (commit `481410d`: "Vercel is the host now") | Mirror. It once returned "Site not found" (commit `a69972a`) |
+| Role | **Primary.** The repo's share links and `og:` tags point here (commit `481410d`: "Vercel is the host now") | Mirror / fallback. It once returned "Site not found" (commit `a69972a`) |
 | HTML / JS / CSS / JSON | `max-age=0, must-revalidate` + ETag: always revalidated, never stale | `max-age=600` + ETag: up to 10 min stale |
 | Images / audio / video | same as above (revalidated on every use) | `max-age=600` |
 | Compression | brotli | gzip |
 | Can we change headers? | **Yes**, with `vercel.json` | **No** (Pages sets them) |
 
-`docs/HANDOFF.md` and the README still call GitHub Pages "the live site". Worth confirming with Alex which host is primary, because the Phase 4.1 baseline was measured on Pages. A re-run on Vercel was close (home 99 vs 99, CLS 0 on both, LCP 2.2 s vs 2.0 s).
+`docs/HANDOFF.md` and the README still call GitHub Pages "the live site"; they predate the move and should be corrected by Alex. The Phase 4.1 baseline was first measured on Pages; a same-day re-run on both hosts was close (home score 99 vs 99, CLS 0 on both, LCP 2.2 s on Vercel vs 2.0 s on Pages).
 
 ## Show-day staleness
 
 - Whether the live page **goes live** never depends on a cached file: the state comes from the visitor's own clock (Wed 1-2 PM ET) in the page's script.
-- What *can* be stale is the code itself after a deploy. On Vercel that is zero (always revalidated). On Pages it is up to 10 minutes, so on that host **don't deploy anything within 10 minutes of 1 PM**.
+- What *can* be stale is the code itself after a deploy. On Vercel (primary) that is zero: everything is always revalidated, so a fix reaches visitors immediately. On the Pages mirror it is up to 10 minutes, so **the "don't deploy within 10 minutes of 1 PM" rule applies only to Pages**. Deploying during the show is still best avoided, but that is about risk, not caching.
 - The data files (`clips.json`, `episodes.json`) are fetched with the default cache mode, so they follow the same rules. Neither is live-critical.
 
 ## What this PR does
