@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Midday Madness — WIUX 99.1">
 <meta name="twitter:description" content="IU's loudest midday sports talk. Every Wednesday at 1 PM on WIUX 99.1 FM.">
 <meta name="twitter:image" content="https://alex22musi.github.io/midday-madness/assets/logo.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110h">
+<link rel="stylesheet" href="styles.css?v=20261110i">
 </head>
 <body class="has-banner">
 <div id="live-banner" class="live-banner" hidden>
@@ -83,10 +83,6 @@
           <span class="player-sub" id="player-sub">Fall 2026 &middot; Episode 10 of 10</span>
         </div>
       </div>
-      <div class="ep-picker">
-        <button type="button" class="ep-allbtn" id="ep-allbtn" aria-expanded="false" aria-controls="ep-sheet">All episodes <span class="ep-chev" aria-hidden="true">&#9662;</span></button>
-        <div class="ep-sheet" id="ep-sheet" hidden></div>
-      </div>
       <div class="player-scrub">
         <span class="player-time" id="player-current">0:00</span>
         <div class="player-bar" id="player-bar" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
@@ -114,6 +110,10 @@
             <text x="24" y="31" text-anchor="middle" font-size="12" font-weight="800" fill="currentColor">30</text>
           </svg>
         </button>
+      </div>
+      <div class="ep-picker">
+        <button type="button" class="ep-allbtn" id="ep-allbtn" aria-expanded="false" aria-controls="ep-sheet">All episodes <span class="ep-chev" aria-hidden="true">&#9662;</span></button>
+        <div class="ep-sheet" id="ep-sheet" hidden></div>
       </div>
       <div class="player-tools">
         <div class="player-speeds" role="group" aria-label="Playback speed">
@@ -429,8 +429,7 @@ document.addEventListener('play', function (e) {
         var title = (it.ep.title || it.ep.label).replace(/^\d+\.\s*/, '');
         html += '<button type="button" class="ep-row" data-date="' + it.ep.date + '">' +
           '<span class="ep-badge">EP ' + it.n + '</span>' +
-          '<span class="ep-rmain"><span class="ep-rdate">' + wd + ' \u00B7 ' + esc(it.ep.label) + '</span>' +
-          '<span class="ep-rtitle">' + esc(title) + '</span></span>' +
+          '<span class="ep-rmain"><span class="ep-rtitle">' + esc(title) + '</span></span>' +
           '<span class="ep-rtime">' + fmtDur(it.ep.durationSec || 0) + '</span>' +
           '<span class="ep-rplay" aria-hidden="true">\u25B6</span></button>';
       });
