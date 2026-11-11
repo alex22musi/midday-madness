@@ -9,7 +9,8 @@
 | Metric | Budget | Home (`/`) | Live (`/live.html`) |
 |---|---|---|---|
 | Performance score | n/a | 93 | 84 |
-| Initial payload (transfer) | ≤ 500 KB | **1,038 KB — OVER** | 113 KB |
+| Initial payload, HTML/CSS/JS/images (the plan's definition; media excluded) | ≤ 500 KB | ~400 KB (passes) | 113 KB |
+| Total transfer incl. media (Lighthouse's number) | n/a | 1,038 KB | 113 KB |
 | LCP | usable < 3 s | **3.1 s — OVER** | 2.1 s |
 | FCP | n/a | 1.0 s | 1.9 s |
 | CLS | ~0 | **0.057** | **0.274 — OVER** |
@@ -23,9 +24,9 @@ No JS file on home (inline script only).
 ### Live payload by type
 Script 55 KB (48 KB is `supabase-js` from jsDelivr, the only third-party call) · Image 38 KB · Stylesheet 9 KB · Document 9 KB.
 
-## Over budget — priority list for 4.2 / 4.3 / 4.4
+## Over budget or needs attention — priority list for 4.2 / 4.3 / 4.4
 
-1. **Home downloads media before any tap (639 KB).** Breaks the standing "no media before a tap" rule and is the reason home is over the 500 KB budget.
+1. **Home downloads 639 KB of media before any tap.** The plan allows metadata-only preload, but the clip mp4s pulled 80–176 KB each, far more than metadata, which competes with the hero logo (LCP) and the posters. The 500 KB budget itself counts HTML/CSS/JS/images only (about 400 KB on home), so it is not over budget on that definition; an earlier version of this doc wrongly said it was.
    - Episode audio: `<audio id="player-audio" preload="metadata" ...>` (`index.html:79`) pulled ~208 KB of the m4a. Metadata-only preload still fetches a lot when the m4a has its index at the end or the server ignores the range; check faststart and consider `preload="none"` plus a hardcoded duration.
    - Clips: ~430 KB of mp4 fetched on load (three clips at 80–176 KB each). The grid renders `preload="none"` with `data-src` (`index.html:624`), but the `IntersectionObserver` (`index.html:~690-697`) assigns `src` and `preload = 'metadata'` to every video within 600 px of the viewport, so the first rows download before any tap. Defer that to tap.
 2. **Clip poster images ~74–77 KB each** (380 KB of images on home). Right at the 80 KB target in the plan, but the budget counts all of them; lazy-load below the fold and shrink to card size.
