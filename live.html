@@ -20,14 +20,38 @@
 <meta name="twitter:title" content="Midday Madness — Live">
 <meta name="twitter:description" content="Listen to Midday Madness live on WIUX 99.1 FM, every Wednesday at 1 PM ET.">
 <meta name="twitter:image" content="https://midday-madness.vercel.app/assets/og-card.jpg">
-<link rel="stylesheet" href="styles.css?v=20261110n">
-<link rel="stylesheet" href="live.css?v=20261110f">
+<link rel="stylesheet" href="styles.css?v=20261111d">
+<link rel="stylesheet" href="live.css?v=20261111a">
+<!-- Start the Supabase CDN connection + download early; the script itself still runs where it always did. -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </head>
 <body>
+<script>
+/* Set the show-state layout class before first paint so the hero never resizes
+   after the page script runs (that resize was the live page's layout shift).
+   Mirrors MM.showStateNow in live-shared.js (Wed 1-2 PM ET = live). The page script
+   still sets the real state afterwards, so a drift here can only cause a shift,
+   never a wrong state. */
+(function () {
+  try {
+    var pv = new URLSearchParams(location.search).get('preview');
+    var live = pv === 'live';
+    if (!pv) {
+      var o = {};
+      new Intl.DateTimeFormat('en-US', { timeZone: 'America/Indiana/Indianapolis', hour12: false, weekday: 'short', hour: 'numeric', minute: 'numeric' })
+        .formatToParts(new Date()).forEach(function (x) { o[x.type] = x.value; });
+      var m = (parseInt(o.hour, 10) % 24) * 60 + parseInt(o.minute, 10);
+      live = o.weekday === 'Wed' && m >= 13 * 60 && m < 14 * 60;
+    }
+    document.body.classList.toggle('countdown-only', !live);
+  } catch (e) {}
+})();
+</script>
 <header class="nav">
   <div class="nav-inner">
     <a class="brand" href="index.html">
-      <img src="assets/logo.jpg" alt="Midday Madness logo">
+      <img src="assets/logo-190.jpg" alt="Midday Madness logo">
       <span>MIDDAY MADNESS</span>
     </a>
     <nav>

@@ -15,6 +15,10 @@ body.countdown-only .livepage-hero {
   justify-content: center;
 }
 body.countdown-only main { padding-bottom: 3rem; }
+/* The early inline script in live.html sets countdown-only before first paint; hide the
+   sections it will hide anyway so the footer never jumps when the page script runs. */
+body.countdown-only #player-section,
+body.countdown-only #ask-section { display: none; }
 
 .livepage-hero {
   max-width: none;
