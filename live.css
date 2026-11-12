@@ -188,33 +188,8 @@ body.live-now .livepage-hero {
 }
 .mute-btn:hover { color: var(--gold-soft); background: rgba(227, 168, 60, 0.14); }
 
-/* ---------- segments ---------- */
-.livepage-segments { max-width: 720px; }
+/* ---------- notes ---------- */
 .section-note { text-align: center; color: var(--muted); font-size: 0.92rem; margin: -1.2rem 0 1.6rem; }
-.segment-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
-.segment {
-  display: flex; align-items: center; gap: 0.8rem;
-  background: var(--card); border: 1px solid rgba(227, 168, 60, 0.18);
-  border-radius: 14px; padding: 0.85rem 1.1rem;
-}
-.segment .seg-title { font-weight: 600; }
-.seg-now {
-  border-color: rgba(229, 72, 77, 0.6);
-  background: linear-gradient(180deg, rgba(229, 72, 77, 0.1), var(--card));
-}
-.seg-done { opacity: 0.45; }
-.seg-done .seg-title { text-decoration: line-through; }
-.seg-tag {
-  margin-left: auto; flex: none;
-  font-size: 0.72rem; font-weight: 900; letter-spacing: 0.14em;
-  color: #ffb3b6; background: rgba(229, 72, 77, 0.16);
-  border: 1px solid rgba(229, 72, 77, 0.5);
-  padding: 0.25rem 0.7rem; border-radius: 999px;
-}
-.seg-tag.seg-next {
-  color: var(--gold-soft); background: rgba(227, 168, 60, 0.12);
-  border-color: rgba(227, 168, 60, 0.5);
-}
 
 /* ---------- ask the hosts ---------- */
 .livepage-ask { max-width: 720px; }
