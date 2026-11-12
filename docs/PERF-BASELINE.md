@@ -33,6 +33,10 @@ No JS file on home (inline script only).
 ### Live payload by type
 Script 55 KB (48 KB is `supabase-js` from jsDelivr, the only third-party call) · Image 38 KB · Stylesheet 9 KB · Document 9 KB.
 
+### Fonts
+
+System font stack only (`styles.css:18`): `-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif`. Verified Nov 11, 2026: no `@font-face` rules, no font files, and no remote font requests anywhere in the repo, so font payload is 0 KB and there is no FOUT/FOIT or font-swap layout shift. The HANDOFF.md asset-diet line "fonts subset + `font-display: swap`" is satisfied vacuously — there is nothing to subset. If a webfont is ever introduced, `scripts/ci/check-site.cjs` fails unless its `@font-face` block uses `font-display: swap`.
+
 ## Over budget or needs attention — priority list for 4.2 / 4.3 / 4.4
 
 1. **Home downloads 639 KB of media before any tap.** The plan allows metadata-only preload, but the clip mp4s pulled 80–176 KB each, far more than metadata, which competes with the hero logo (LCP) and the posters. The 500 KB budget itself counts HTML/CSS/JS/images only (about 400 KB on home), so it is not over budget on that definition; an earlier version of this doc wrongly said it was.
