@@ -115,6 +115,24 @@ for (const m of indexHtml.matchAll(/<(?:video|audio)[^>]*>/g)) {
   if (/\bautoplay\b/.test(m[0]) || /preload=["']auto["']/.test(m[0])) err('index.html: media must not autoplay or preload="auto" (nothing downloads before a tap)');
 }
 
+// ---- 5. Fonts: a webfont may never ship without font-display: swap -----
+// The site uses a system font stack only (styles.css) — no @font-face, no
+// font files, no remote font requests. If a webfont is ever introduced, the
+// HANDOFF.md asset diet requires subsetting plus font-display: swap, so text
+// never blocks on a font download. Enforce the swap half here; subsetting
+// stays a review-time check (a file-size rule cannot tell a subset apart).
+const FONT_TEXT = /\.(html|css|js)$/;
+const REMOTE_FONT = /https?:\/\/(?:fonts\.googleapis\.com|fonts\.gstatic\.com|use\.typekit\.net|cdn\.fontsource\.org)[^\s"'\)]*/gi;
+for (const f of tracked.filter((f) => FONT_TEXT.test(f))) {
+  if (f === 'scripts/ci/check-site.cjs') continue; // this file names the hosts in its own regex
+  const src = fs.readFileSync(path.join(root, f), 'utf8');
+  for (const m of src.matchAll(/@font-face\s*\{[^}]*\}/g)) {
+    if (!/font-display\s*:\s*swap\b/.test(m[0])) err(`${f}: @font-face without font-display: swap`);
+  }
+  for (const m of src.matchAll(REMOTE_FONT)) warn(`${f}: remote font reference ${m[0]} (subset it and keep font-display: swap)`);
+}
+for (const f of tracked) if (/\.(woff2?|ttf|otf|eot)$/i.test(f)) warn(`Font file tracked: ${f} (subset it; keep it small)`);
+
 // ---- Report -------------------------------------------------------------
 warnings.forEach((w) => console.log(`::warning::${w}`));
 errors.forEach((e) => console.log(`::error::${e}`));
