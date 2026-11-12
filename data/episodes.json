@@ -118,5 +118,14 @@
       "clip-2026-11-04-take-the-couch-saturday",
       "clip-2026-11-04-dont-spend-sell-the-team"
     ]
+  },
+  {
+    "date": "2026-11-11",
+    "label": "Nov 11, 2026",
+    "title": "13. Nov 11, 2026 Midday Madness",
+    "description": null,
+    "durationSec": 3355,
+    "audioFile": "assets/episodes/ep-2026-11-11.mp3",
+    "clips": []
   }
 ]
