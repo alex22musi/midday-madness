@@ -52,6 +52,24 @@ body.live-now .livepage-hero {
   text-shadow: 0 0 34px rgba(227, 168, 60, 0.35);
 }
 
+/* segmented days / hrs / min / sec clock (off-air + starting soon) */
+.countdown-seg { --gap: clamp(1.1rem, 5vw, 2rem); display: flex; justify-content: center; gap: var(--gap); }
+.seg { position: relative; display: flex; flex-direction: column; align-items: center; min-width: clamp(3.4rem, 16vw, 5.4rem); }
+.seg-num {
+  font-size: clamp(2.4rem, 11vw, 4.2rem); font-weight: 900; line-height: 1; color: var(--text);
+  font-variant-numeric: tabular-nums; text-shadow: 0 0 34px rgba(227, 168, 60, 0.35);
+}
+.seg-lbl { margin-top: 0.45rem; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.22em; color: var(--muted); }
+.seg + .seg::before {
+  content: ':'; position: absolute; top: 0; left: calc(var(--gap) / -2); transform: translateX(-50%);
+  font-size: clamp(2.4rem, 11vw, 4.2rem); font-weight: 900; line-height: 1; color: rgba(227, 168, 60, 0.5);
+}
+
+/* off-air links under the clock */
+.offair-links { margin-top: 2rem; display: flex; flex-direction: column; align-items: center; gap: 0.7rem; font-size: 0.95rem; }
+.offair-link { color: var(--gold-soft); text-decoration: none; border-bottom: 1px dotted rgba(242, 198, 109, 0.6); }
+.offair-link:hover { color: var(--gold); border-bottom-style: solid; }
+
 /* ---------- player card ---------- */
 .livepage-player { max-width: 720px; }
 .player-card {

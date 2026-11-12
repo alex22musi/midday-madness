@@ -21,7 +21,7 @@
 <meta name="twitter:description" content="Listen to Midday Madness live on WIUX 99.1 FM, every Wednesday at 1 PM ET.">
 <meta name="twitter:image" content="https://midday-madness.vercel.app/assets/og-card.jpg">
 <link rel="stylesheet" href="styles.css?v=20261111d">
-<link rel="stylesheet" href="live.css?v=20261111a">
+<link rel="stylesheet" href="live.css?v=20261112b">
 <!-- Start the Supabase CDN connection + download early; the script itself still runs where it always did. -->
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
@@ -72,6 +72,16 @@
       <div class="countdown" id="countdown-wrap" aria-live="polite">
         <span class="countdown-label" id="countdown-label">LIVE IN</span>
         <span class="countdown-time" id="countdown-time">--:--</span>
+        <div class="countdown-seg" id="countdown-seg" hidden>
+          <div class="seg"><span class="seg-num" id="seg-d">--</span><span class="seg-lbl">DAYS</span></div>
+          <div class="seg"><span class="seg-num" id="seg-h">--</span><span class="seg-lbl">HRS</span></div>
+          <div class="seg"><span class="seg-num" id="seg-m">--</span><span class="seg-lbl">MIN</span></div>
+          <div class="seg"><span class="seg-num" id="seg-s">--</span><span class="seg-lbl">SEC</span></div>
+        </div>
+      </div>
+      <div class="offair-links" id="offair-links" hidden>
+        <a class="offair-link" id="cal-link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Midday%20Madness%20LIVE" target="_blank" rel="noopener">Add Wednesdays 1 PM to your calendar</a>
+        <a class="offair-link" id="latest-ep" href="index.html#episode" hidden>Missed it? Listen to the latest episode</a>
       </div>
     </div>
   </section>
@@ -145,7 +155,7 @@
   <p>&copy; 2026 Midday Madness &bull; WIUX 99.1 &bull; <a href="privacy.html">Privacy Policy</a> &bull; <a href="index.html">Home</a></p>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="live-shared.js?v=20261111a"></script>
+<script src="live-shared.js?v=20261112a"></script>
 <script>
 (function () {
   'use strict';
@@ -181,6 +191,9 @@
   var countdownWrap = MM.el('countdown-wrap');
   var countdownLabel = MM.el('countdown-label');
   var countdownTime = MM.el('countdown-time');
+  var countdownSeg = MM.el('countdown-seg');
+  var segEls = { d: MM.el('seg-d'), h: MM.el('seg-h'), m: MM.el('seg-m'), s: MM.el('seg-s') };
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
   var playerSection = MM.el('player-section');
   var askSection = MM.el('ask-section');
 
@@ -192,6 +205,43 @@
     playerSection.hidden = !live;
     askSection.hidden = !live;
     document.body.classList.toggle('countdown-only', !live);
+    offairLinks.hidden = live;
+    if (!live) { buildCalLink(); loadLatestEpisode(); }
+  }
+
+  var offairLinks = MM.el('offair-links');
+  var calLink = MM.el('cal-link');
+  var latestEp = MM.el('latest-ep');
+
+  // Weekly-recurring Google Calendar event starting at the next show.
+  function buildCalLink() {
+    function p2(n) { return (n < 10 ? '0' : '') + n; }
+    function fmt(ms) {
+      var d = new Date(ms);
+      return d.getUTCFullYear() + p2(d.getUTCMonth() + 1) + p2(d.getUTCDate()) + 'T' + p2(d.getUTCHours()) + p2(d.getUTCMinutes()) + '00Z';
+    }
+    var start = Date.now() + MM.msUntilShow();
+    calLink.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text=' + encodeURIComponent('Midday Madness LIVE') +
+      '&dates=' + fmt(start) + '/' + fmt(start + 3600000) +
+      '&recur=' + encodeURIComponent('RRULE:FREQ=WEEKLY;BYDAY=WE') +
+      '&ctz=' + encodeURIComponent('America/Indiana/Indianapolis') +
+      '&details=' + encodeURIComponent("IU's midday sports talk, live on WIUX 99.1 FM.") +
+      '&location=' + encodeURIComponent('https://midday-madness.vercel.app');
+  }
+  buildCalLink();
+
+  // Latest episode link: only fetched when the page is the off-air lobby.
+  var epLoaded = false;
+  function loadLatestEpisode() {
+    if (epLoaded) return;
+    epLoaded = true;
+    fetch('data/episodes.json').then(function (r) { return r.json(); }).then(function (eps) {
+      var e = eps && eps[eps.length - 1];
+      if (!e) return;
+      latestEp.title = e.title;
+      latestEp.hidden = false;
+    }).catch(function () {});
   }
 
   function renderStatus() {
@@ -241,10 +291,17 @@
       setSections(s);
       if (s === 'live') tryAutoplay();
     }
+    // On air: one elapsed clock. Otherwise: days / hrs / min / sec to the next show.
+    countdownTime.hidden = s !== 'live';
+    countdownSeg.hidden = s === 'live';
     if (s === 'live') {
       countdownTime.textContent = MM.fmtClock(elapsedMs());
     } else {
-      countdownTime.textContent = MM.fmtCountdown(MM.msUntilShow());
+      var c = MM.countdownParts(MM.msUntilShow());
+      segEls.d.textContent = pad2(c.d);
+      segEls.h.textContent = pad2(c.h);
+      segEls.m.textContent = pad2(c.m);
+      segEls.s.textContent = pad2(c.s);
     }
   }
 
