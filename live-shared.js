@@ -132,6 +132,12 @@
     return h > 0 ? h + ':' + pad(m) + ':' + pad(s) : m + ':' + pad(s);
   }
 
+  // { d, h, m, s } for a countdown (all ints); drives the segmented off-air clock
+  function countdownParts(ms) {
+    var t = Math.max(0, Math.ceil(ms / 1000));
+    return { d: Math.floor(t / 86400), h: Math.floor((t % 86400) / 3600), m: Math.floor((t % 3600) / 60), s: t % 60 };
+  }
+
   function fmtClock(ms) {
     var s = Math.floor(ms / 1000);
     var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
@@ -539,6 +545,7 @@
     msIntoShow: msIntoShow,
     todayKey: todayKey,
     fmtCountdown: fmtCountdown,
+    countdownParts: countdownParts,
     fmtClock: fmtClock,
     supabaseClient: supabaseClient,
     isConfigured: isConfigured,
