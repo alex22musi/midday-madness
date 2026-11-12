@@ -111,3 +111,14 @@ About 0.7 s on both stream hosts.
 - Stream host and "buffered at tap" were not recorded for the iPhone runs
   (expected: `tunein-live-e.cdnstream1.com`, the relay iOS is kept on).
 - Lock-screen (Now Playing) check: not yet recorded.
+
+## Re-measure — Nov 12, 2026 (production, Vercel)
+
+Method as in the baseline: Chromium (desktop), CDP Slow-4G profile (1.6 Mbps down / 150 ms latency), cache disabled, timer = tap -> media `playing` event, 3 trials. Payloads in a real browser at load + 4.5 s settle, no scroll, no tap.
+
+- **Clip time-to-audio** (first card, cold tap): 2.62 s / 2.76 s / 2.56 s (a partial first run read 2.14 s / 2.80 s). Median ~2.6 s — improved from the Nov 10 baseline (3.2–5.4 s) after #11 made clips poster-only, but still **over** the < 1.5 s budget. The remaining cause is file size (1080p clips, ~13–16 MB); the fix is the 720p re-encode flagged in the baseline — a clip-pipeline follow-up, not part of the measurement issue.
+- **Episode time-to-audio:** 0.99 s / 1.53 s / 0.05 s — inside the < 2 s budget. `preload="metadata"` is retained (Alex's call, Nov 12: faster first play).
+- **Initial payload:** home 417 KB decoded (document 42, CSS 23, script 4, images 348 incl. first-row posters, data fetch 10) — under the 500 KB budget, with **zero media bytes before a tap**; the only pre-tap media request is the episode audio's metadata preload. Live page 317 KB decoded, ~117 KB on the wire gzipped (supabase-js is most of it). Nov 10 comparison: home ~400 KB initial **plus** 639 KB of pre-tap media.
+- **Live flip after the caching change (#13):** `live.html` serves `Cache-Control: public, max-age=0, must-revalidate` (never stale); `/assets/*` serves `max-age=3600` per vercel.json. Forced-live (`?preview=live`) enters ON AIR with the elapsed counter running and the stream loaded; off-air shows the segmented countdown.
+
+Issues #2, #3, and #6 were closed on the strength of this re-measure (Nov 12, 2026).
