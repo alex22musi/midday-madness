@@ -127,5 +127,18 @@
     "durationSec": 3355,
     "audioFile": "assets/episodes/ep-2026-11-11.mp3",
     "clips": []
+  },
+  {
+    "date": "2026-11-18",
+    "label": "Nov 18, 2026",
+    "title": "14. Nov 18, 2026 Midday Madness",
+    "description": null,
+    "durationSec": 3309,
+    "audioFile": "assets/episodes/ep-2026-11-18.mp3",
+    "clips": [
+      "clip-2026-11-18-wilson-takes-the-job",
+      "clip-2026-11-18-the-committee-protects-bama",
+      "clip-2026-11-18-indiana-basketball-is-back"
+    ]
   }
 ]
